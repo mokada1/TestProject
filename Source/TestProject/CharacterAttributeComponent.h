@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "TPUtil.h"
+#include "Enums.h"
 #include "Components/ActorComponent.h"
 #include "CharacterAttributeComponent.generated.h"
 

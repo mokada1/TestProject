@@ -3,20 +3,14 @@
 #pragma once
 
 #include "TSingleton.h"
-#include <vector>
 #include <wchar.h>
 
-using namespace std;
-
-/**
- * 
- */
 class TESTPROJECT_API TPError : public TSingleton<TPError>
 {
 public:
-	void PrintError(const wchar_t* message);
-	void PrintError(const wchar_t* message, const int code);
-	void PrintErrors();
+	void PrintError(const wchar_t* const message);
+	void PrintError(const wchar_t* const message, const int code);
+
 private:
-	const wchar_t* ConcatMessage(const wchar_t* message, const int code);
+	const wchar_t* ConcatMessage(const wchar_t* const message, const int code);
 };

@@ -6,7 +6,7 @@
 #include "UObject/Object.h"
 #include "HAL/Runnable.h"
 #include <WinSock2.h>
-#include "Protocol.h"
+#include "Packet.h"
 #include "SocketRSThread.generated.h"
 
 /**
@@ -24,7 +24,7 @@ public:
 	virtual void Exit() override {}
 
 	void Start(SOCKET socket);		
-	bool SendPacket(char* datas, int dataSize);	
+	bool SendPacket(const Packet& packet);
 
 private:
 	bool RecvPacket();

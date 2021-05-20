@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "TPUtil.h"
+#include "Enums.h"
 #include "AbliltyUseInfo.h"
 #include "Animation/AnimMontage.h"
 #include "UObject/Object.h"

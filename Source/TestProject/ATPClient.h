@@ -15,7 +15,7 @@ public:
 		bool CreateClientAndConnect();
 
 	UFUNCTION(BlueprintCallable, Category = Network)
-	bool SendTestPacket(const int characterId, const FVector pos);
+	bool SendTestPacket(const FString userId, const FString password);
 
 protected:
 	virtual void EndPlay(const EEndPlayReason::Type endPlayReason) override;
