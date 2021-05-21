@@ -10,12 +10,8 @@ Packet* PacketGenerator::Parse(char* const buffer, DWORD bytesTransferred)
 	return new Packet(buffer, bytesTransferred, header, false);
 }
 
-Packet* PacketGenerator::CreateReqLogin(const wchar_t* const userId, const wchar_t* const password)
+Packet* PacketGenerator::CreateReqLogin(const char* const userId, const char* const password)
 {
-	char hUserId[SIZE_USER_USER_ID], hPassword[SIZE_USER_PASSWORD];;
-	TPUtil::GetInstance().WCharToChar(hUserId, SIZE_USER_USER_ID, userId);
-	TPUtil::GetInstance().WCharToChar(hPassword, SIZE_USER_PASSWORD, password);
-
 	auto buffer = new char[BUFSIZE];
 	memset(buffer, 0, BUFSIZE);
 
@@ -23,8 +19,8 @@ Packet* PacketGenerator::CreateReqLogin(const wchar_t* const userId, const wchar
 	SetHeaderOfBuff(buffer, header);
 
 	flatbuffers::FlatBufferBuilder fbb;
-	auto offsetUserId = fbb.CreateString(hUserId);
-	auto offsetPassword = fbb.CreateString(hPassword);
+	auto offsetUserId = fbb.CreateString(userId);
+	auto offsetPassword = fbb.CreateString(password);
 
 	fbb.Finish(CreateTB_ReqLogin(fbb, offsetUserId, offsetPassword));
 

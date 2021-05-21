@@ -1,6 +1,7 @@
 #include "ATPClient.h"
 #include "TPError.h"
 #include "PacketGenerator.h"
+#include "TPUtil.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -82,7 +83,11 @@ bool ATPClient::Close()
 
 bool ATPClient::SendTestPacket(const FString userId, const FString password)
 {
-    auto packet = PacketGenerator::GetInstance().CreateReqLogin(*userId, *password);
+    char hUserId[SIZE_USER_USER_ID], hPassword[SIZE_USER_PASSWORD];
+    TPUtil::GetInstance().WCharToMultiByte(hUserId, SIZE_USER_USER_ID, *userId);
+    TPUtil::GetInstance().WCharToMultiByte(hPassword, SIZE_USER_PASSWORD, *password);
+
+    auto packet = PacketGenerator::GetInstance().CreateReqLogin(hUserId, hPassword);
     bool result = rsThread->SendPacket(*packet);
     delete packet;
     return result;

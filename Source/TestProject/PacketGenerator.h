@@ -5,12 +5,15 @@
 #include "TSingleton.h"
 #include "TP_generated.h"
 #include "Packet.h"
+#include <string.h>
+
+using namespace std;
 
 class TESTPROJECT_API PacketGenerator : public TSingleton<PacketGenerator>
 {
 public:
 	Packet* Parse(char* const buffer, DWORD bytesTransferred);
-	Packet* CreateReqLogin(const wchar_t* const userId, const wchar_t* const password);
+	Packet* CreateReqLogin(const char* const userId, const char* const password);
 
 private:
 	void SetHeaderOfBuff(char* const buffer, PROTOCOL header);
