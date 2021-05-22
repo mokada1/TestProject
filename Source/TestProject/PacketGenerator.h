@@ -12,10 +12,10 @@ using namespace std;
 class TESTPROJECT_API PacketGenerator : public TSingleton<PacketGenerator>
 {
 public:
-	Packet* Parse(char* const buffer, DWORD bytesTransferred);
-	Packet* CreateReqLogin(const char* const userId, const char* const password);
+	Packet Parse(char* const buffer, DWORD bytesTransferred);
+	Packet CreateReqLogin(const char* const userId, const char* const password);
 
 private:
 	void SetHeaderOfBuff(char* const buffer, PROTOCOL header);
-	Packet* CreatePacket(flatbuffers::FlatBufferBuilder& _fbb, char* const buffer, PROTOCOL header);
+	Packet CreatePacket(flatbuffers::FlatBufferBuilder& _fbb, char* const buffer, PROTOCOL header);
 };

@@ -1,16 +1,16 @@
 #include "PacketGenerator.h"
 #include "TPUtil.h"
 
-Packet* PacketGenerator::Parse(char* const buffer, DWORD bytesTransferred)
+Packet PacketGenerator::Parse(char* const buffer, DWORD bytesTransferred)
 {
 	unsigned char byte1 = buffer[0];
 	unsigned char byte2 = buffer[1];
 	uint16_t headerInt16 = byte1 | byte2 << 8;
 	PROTOCOL header = static_cast<PROTOCOL>(headerInt16);
-	return new Packet(buffer, bytesTransferred, header, false);
+	return Packet(buffer, bytesTransferred, header, false);
 }
 
-Packet* PacketGenerator::CreateReqLogin(const char* const userId, const char* const password)
+Packet PacketGenerator::CreateReqLogin(const char* const userId, const char* const password)
 {
 	auto buffer = new char[BUFSIZE];
 	memset(buffer, 0, BUFSIZE);
@@ -36,11 +36,11 @@ void PacketGenerator::SetHeaderOfBuff(char* const buffer, PROTOCOL header)
 	buffer[1] = byte2;
 }
 
-Packet* PacketGenerator::CreatePacket(flatbuffers::FlatBufferBuilder& _fbb, char* const buffer, PROTOCOL header)
+Packet PacketGenerator::CreatePacket(flatbuffers::FlatBufferBuilder& _fbb, char* const buffer, PROTOCOL header)
 {
 	auto bp = _fbb.GetBufferPointer();
 	auto bSize = _fbb.GetSize();
 	memcpy(&buffer[PACKET_HEAD_SIZE], bp, bSize);
 	const int BUFFER_SIZE = PACKET_HEAD_SIZE + bSize;
-	return new Packet(buffer, BUFFER_SIZE, header);
+	return Packet(buffer, BUFFER_SIZE, header);
 }

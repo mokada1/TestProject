@@ -88,7 +88,5 @@ bool ATPClient::SendTestPacket(const FString userId, const FString password)
     TPUtil::GetInstance().WCharToMultiByte(hPassword, SIZE_USER_PASSWORD, *password);
 
     auto packet = PacketGenerator::GetInstance().CreateReqLogin(hUserId, hPassword);
-    bool result = rsThread->SendPacket(*packet);
-    delete packet;
-    return result;
+    return rsThread->SendPacket(packet);
 }
