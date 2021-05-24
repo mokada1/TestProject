@@ -2,14 +2,13 @@
 
 #pragma once
 
-#include "Uncopyable.h"
 #include "TPDefine.h"
 #include "Protocol.h"
 
 /**
  * 
  */
-class TESTPROJECT_API Packet : public Uncopyable
+class Packet
 {
 public:
 	Packet(const Packet& rhs);

@@ -2,6 +2,7 @@
 #include "TPError.h"
 #include "PacketGenerator.h"
 #include "TPUtil.h"
+#include "PacketService.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,9 +13,14 @@ void ATPClient::EndPlay(const EEndPlayReason::Type endPlayReason)
     Close();
 }
 
-bool ATPClient::CreateClientAndConnect()
+bool ATPClient::CreateClientAndConnect(const FString _serverIp, const FString _serverPort)
 {
-    if (!Initialize())
+    if (isConnected)
+    {
+        return false;
+    }
+
+    if (!Initialize(_serverIp, _serverPort))
     {
         return false;
     }
@@ -23,10 +29,15 @@ bool ATPClient::CreateClientAndConnect()
     {
         return false;
     }
+
+    isConnected = true;
+
+    SetRecvCallback();
+
     return true;
 }
 
-bool ATPClient::Initialize()
+bool ATPClient::Initialize(const FString _serverIp, const FString _serverPort)
 {
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -41,11 +52,16 @@ bool ATPClient::Initialize()
         TPError::GetInstance().PrintError(L"socket() error");
         return false;
     }
+    
+    char hServerIp[SERVER_IP_SIZE];
+	TPUtil::GetInstance().WCharToMultiByte(hServerIp, SERVER_IP_SIZE, *_serverIp);
+    serverIp = hServerIp;
+    serverPort = FCString::Atoi(*_serverPort);
 
     memset(&recvAddr, 0, sizeof(recvAddr));
     recvAddr.sin_family = AF_INET;
-    inet_pton(AF_INET, SERVER_IP, &(recvAddr.sin_addr));
-    recvAddr.sin_port = htons(SERVER_PORT);
+    inet_pton(AF_INET, serverIp, &(recvAddr.sin_addr));
+    recvAddr.sin_port = htons(serverPort);
 
     return true;
 }
@@ -81,11 +97,16 @@ bool ATPClient::Close()
     return true;
 }
 
-bool ATPClient::SendTestPacket(const FString userId, const FString password)
+void ATPClient::SetRecvCallback()
+{
+    PacketService::GetInstance().delGameRoomObj += [this]() { if (!isLogined) isLogined = true; };
+}
+
+bool ATPClient::ReqLogin(const FString _userId, const FString _password)
 {
     char hUserId[SIZE_USER_USER_ID], hPassword[SIZE_USER_PASSWORD];
-    TPUtil::GetInstance().WCharToMultiByte(hUserId, SIZE_USER_USER_ID, *userId);
-    TPUtil::GetInstance().WCharToMultiByte(hPassword, SIZE_USER_PASSWORD, *password);
+    TPUtil::GetInstance().WCharToMultiByte(hUserId, SIZE_USER_USER_ID, *_userId);
+    TPUtil::GetInstance().WCharToMultiByte(hPassword, SIZE_USER_PASSWORD, *_password);
 
     auto packet = PacketGenerator::GetInstance().CreateReqLogin(hUserId, hPassword);
     return rsThread->SendPacket(packet);

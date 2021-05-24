@@ -31,6 +31,10 @@ void PacketService::Process(const Packet& packet)
 			UE_LOG(LogTemp, Log, TEXT("UserId:%s Password:%s"), *FString(wUserId), *FString(wPassword));
 			UE_LOG(LogTemp, Log, TEXT("Location:%f,%f,%f"), it->UserLocation()->Location()->x(), it->UserLocation()->Location()->y(), it->UserLocation()->Location()->z());
 		}
+		if (objUserList->size() > 0)
+		{
+			delGameRoomObj();
+		}		
 		break;
 	}
 	case PROTOCOL::ENTER_GAME_ROOM:

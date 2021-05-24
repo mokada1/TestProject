@@ -12,22 +12,40 @@ class TESTPROJECT_API ATPClient : public AActor
 
 public:
 	UFUNCTION(BlueprintCallable, Category = Network)
-		bool CreateClientAndConnect();
+	bool CreateClientAndConnect(const FString _serverIp, const FString _serverPort);
 
 	UFUNCTION(BlueprintCallable, Category = Network)
-	bool SendTestPacket(const FString userId, const FString password);
+	bool ReqLogin(const FString _userId, const FString _password);
 
 protected:
+	UPROPERTY(BlueprintReadWrite, Category = Network)
+	FString propServerIp;
+
+	UPROPERTY(BlueprintReadWrite, Category = Network)
+	FString propServerPort;
+
+	UPROPERTY(BlueprintReadWrite, Category = Network)
+	FString propUserId;
+
+	UPROPERTY(BlueprintReadWrite, Category = Network)
+	FString propPassword;
+
+	UPROPERTY(BlueprintReadOnly, Category = Network)
+	bool isConnected;
+
+	UPROPERTY(BlueprintReadOnly, Category = Network)
+	bool isLogined;
+
 	virtual void EndPlay(const EEndPlayReason::Type endPlayReason) override;
 
 private:
-	bool Initialize();
+	bool Initialize(const FString _serverIp, const FString _serverPort);
 	bool Connect();
 	bool Close();	
+	void SetRecvCallback();
 
-	const int HEAD_SIZE = sizeof(PROTOCOL);
-	const char* SERVER_IP = "127.0.0.1";
-	const uint8_t SERVER_PORT = static_cast<uint8_t>(2738);
+	char* serverIp;
+	uint8_t serverPort;
 	SOCKET hSocket;
 	SOCKADDR_IN recvAddr;
 	USocketRSThread* rsThread;
