@@ -42,14 +42,14 @@ bool ATPClient::Initialize(const FString _serverIp, const FString _serverPort)
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
     {
-        TPError::GetInstance().PrintError(L"WSAStartup() error!");
+        TPError::GetInstance().PrintError(L"WSAStartup() Error!");
         return false;
     }
 
     hSocket = WSASocket(PF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
     if (hSocket == INVALID_SOCKET)
     {
-        TPError::GetInstance().PrintError(L"socket() error");
+        TPError::GetInstance().PrintError(L"Socket() Error");
         return false;
     }
     
@@ -70,7 +70,7 @@ bool ATPClient::Connect()
 {
     if (connect(hSocket, (SOCKADDR*)&recvAddr, sizeof(recvAddr)) == SOCKET_ERROR)
     {
-        TPError::GetInstance().PrintError(L"connect() error!");
+        TPError::GetInstance().PrintError(L"Connect() Error!");
         return false;
     }
 
@@ -94,20 +94,40 @@ bool ATPClient::Close()
         closesocket(hSocket);
 	}
     WSACleanup();
+    ClearRecvCallback();
     return true;
 }
 
 void ATPClient::SetRecvCallback()
+{       
+    PacketService::GetInstance().recvCallGameRoomObj += std::bind(&ATPClient::CallGameRoomObj, this);
+}
+
+void ATPClient::ClearRecvCallback()
 {
-    PacketService::GetInstance().delGameRoomObj += [this]() { if (!isLogined) isLogined = true; };
+    PacketService::GetInstance().recvCallGameRoomObj.clear();
 }
 
 bool ATPClient::ReqLogin(const FString _userId, const FString _password)
 {
+	if (isLogined)
+	{
+		return false;
+	}
+
     char hUserId[SIZE_USER_USER_ID], hPassword[SIZE_USER_PASSWORD];
     TPUtil::GetInstance().WCharToMultiByte(hUserId, SIZE_USER_USER_ID, *_userId);
     TPUtil::GetInstance().WCharToMultiByte(hPassword, SIZE_USER_PASSWORD, *_password);
 
     auto packet = PacketGenerator::GetInstance().CreateReqLogin(hUserId, hPassword);
     return rsThread->SendPacket(packet);
+}
+
+void ATPClient::CallGameRoomObj()
+{
+    if (!isLogined)
+    {
+        isLogined = true;
+    }
+    K2_RecvCallGameRoomObj();
 }

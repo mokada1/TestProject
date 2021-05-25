@@ -33,7 +33,7 @@ void PacketService::Process(const Packet& packet)
 		}
 		if (objUserList->size() > 0)
 		{
-			delGameRoomObj();
+			recvCallGameRoomObj();
 		}		
 		break;
 	}

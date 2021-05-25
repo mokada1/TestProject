@@ -17,7 +17,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Network)
 	bool ReqLogin(const FString _userId, const FString _password);
 
-protected:
+protected:		
+	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallGameRoomObj", meta = (ScriptName = "RecvCallGameRoomObj"))
+	void K2_RecvCallGameRoomObj();		
+	void CallGameRoomObj();
+
 	UPROPERTY(BlueprintReadWrite, Category = Network)
 	FString propServerIp;
 
@@ -43,6 +47,7 @@ private:
 	bool Connect();
 	bool Close();	
 	void SetRecvCallback();
+	void ClearRecvCallback();
 
 	char* serverIp;
 	uint8_t serverPort;
