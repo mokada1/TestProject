@@ -9,5 +9,8 @@ class PacketService : public TSingleton<PacketService>
 public:
 	void Process(const Packet& packet);
 
+	Delegate<const FString&> recvCallError;
 	Delegate<> recvCallGameRoomObj;
+	Delegate<> recvCallEnterGameRoom;
+	Delegate<> recvCallExitGameRoom;
 };
