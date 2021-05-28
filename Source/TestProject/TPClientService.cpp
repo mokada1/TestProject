@@ -4,7 +4,7 @@
 #include "PacketProcessor.h"
 #include "PacketService.h"
 #include "PacketGenerator.h"
-#include "TPUtil.h"
+#include "ObjUser.h"
 
 void ATPClientService::CallBeginPlay()
 {
@@ -20,9 +20,9 @@ void ATPClientService::CallEndPlay(const EEndPlayReason::Type EndPlayReason)
 void ATPClientService::SetRecvCallback()
 {
 	PacketService::GetInstance().recvCallError += std::bind(&ATPClientService::CallError, this, std::placeholders::_1);
-	PacketService::GetInstance().recvCallGameRoomObj += std::bind(&ATPClientService::CallGameRoomObj, this);
-	PacketService::GetInstance().recvCallEnterGameRoom += std::bind(&ATPClientService::CallEnterGameRoom, this);
-	PacketService::GetInstance().recvCallExitGameRoom += std::bind(&ATPClientService::CallExitGameRoom, this);
+	PacketService::GetInstance().recvCallGameRoomObj += std::bind(&ATPClientService::CallGameRoomObj, this, std::placeholders::_1);
+	PacketService::GetInstance().recvCallEnterGameRoom += std::bind(&ATPClientService::CallEnterGameRoom, this, std::placeholders::_1);
+	PacketService::GetInstance().recvCallExitGameRoom += std::bind(&ATPClientService::CallExitGameRoom, this, std::placeholders::_1);
 }
 
 void ATPClientService::ClearRecvCallback()
@@ -61,21 +61,21 @@ void ATPClientService::CallError(const FString& message)
 	K2_RecvCallError(message);
 }
 
-void ATPClientService::CallGameRoomObj()
+void ATPClientService::CallGameRoomObj(const TArray<UObjUser*>& objUserList)
 {
 	if (!isLogined)
 	{
 		isLogined = true;
 	}
-	K2_RecvCallGameRoomObj();
+	K2_RecvCallGameRoomObj(objUserList);
 }
 
-void ATPClientService::CallEnterGameRoom()
+void ATPClientService::CallEnterGameRoom(const UObjUser* const objUser)
 {
-	K2_RecvCallEnterGameRoom();
+	K2_RecvCallEnterGameRoom(objUser);
 }
 
-void ATPClientService::CallExitGameRoom()
+void ATPClientService::CallExitGameRoom(const FString& userId)
 {
-	K2_RecvCallExitGameRoom();
+	K2_RecvCallExitGameRoom(userId);
 }

@@ -14,6 +14,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Network)
 	bool CreateClientAndConnect(const FString& _serverIp, const FString& _serverPort);
 
+	UFUNCTION(BlueprintCallable, Category = Network)
+	void ProcessPackets();
+
 	bool SendPacket(const Packet& packet);
 
 protected:

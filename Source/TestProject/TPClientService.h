@@ -5,6 +5,8 @@
 #include "GameFramework/Actor.h"
 #include "TPClientService.generated.h"
 
+class UObjUser;
+
 UCLASS(BlueprintType, Blueprintable)
 class TESTPROJECT_API ATPClientService : public AActor
 {
@@ -35,16 +37,16 @@ protected:
 	void CallError(const FString& message);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallGameRoomObj", meta = (ScriptName = "RecvCallGameRoomObj"))
-	void K2_RecvCallGameRoomObj();
-	void CallGameRoomObj();
+	void K2_RecvCallGameRoomObj(const TArray<UObjUser*>& objUserList);
+	void CallGameRoomObj(const TArray<UObjUser*>& objUserList);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallEnterGameRoom", meta = (ScriptName = "RecvCallEnterGameRoom"))
-	void K2_RecvCallEnterGameRoom();
-	void CallEnterGameRoom();
+	void K2_RecvCallEnterGameRoom(const UObjUser* const objUser);
+	void CallEnterGameRoom(const UObjUser* const objUser);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallExitGameRoom", meta = (ScriptName = "RecvCallExitGameRoom"))
-	void K2_RecvCallExitGameRoom();
-	void CallExitGameRoom();
+	void K2_RecvCallExitGameRoom(const FString& userId);
+	void CallExitGameRoom(const FString& userId);
 
 private:
 	void SetRecvCallback();

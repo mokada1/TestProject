@@ -90,7 +90,7 @@ bool USocketRSThread::RecvPacket()
 	
 	if (recvBytes > 0)
 	{
-		PacketProcessor::GetInstance().Process(dataBuf.buf, recvBytes);
+		PacketProcessor::GetInstance().PushToPacketList(dataBuf.buf, recvBytes);
 	}
 	return true;
 }

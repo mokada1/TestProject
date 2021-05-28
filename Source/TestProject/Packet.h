@@ -15,6 +15,7 @@ public:
 	Packet& operator=(const Packet& rhs);
 	Packet(Packet&& rhs) noexcept;
 	Packet& operator=(Packet&& rhs) noexcept;
+	Packet();
 	Packet(char* const _buffer, ULONG _packetSize, PROTOCOL _header);
 	Packet(char* const _buffer, ULONG _packetSize, PROTOCOL _header, bool _isDAllocBuf);
 	~Packet();

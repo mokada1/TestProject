@@ -27,6 +27,11 @@ Packet& Packet::operator=(Packet&& rhs) noexcept
 	return *this;
 }
 
+Packet::Packet()
+{
+	Init(nullptr, 0, PROTOCOL::TP_ERROR, true);
+}
+
 Packet::Packet(char* const _buffer, ULONG _packetSize, PROTOCOL _header)
 {
 	Init(_buffer, _packetSize, _header, true);

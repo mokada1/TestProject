@@ -8,10 +8,21 @@ void PacketProcessor::SetClient(ATPClient* const _client)
 	client = _client;
 }
 
-void PacketProcessor::Process(char* const buffer, const DWORD bytesTransferred)
+void PacketProcessor::PushToPacketList(char* const buffer, const DWORD bytesTransferred)
 {
-	auto packet = PacketGenerator::GetInstance().Parse(buffer, bytesTransferred);
-	PacketService::GetInstance().Process(packet);
+	const auto& packet = PacketGenerator::GetInstance().Parse(buffer, bytesTransferred);
+	packetList.push(packet);
+}
+
+bool PacketProcessor::Process()
+{
+	if (packetList.empty())
+	{
+		return false;
+	}
+	PacketService::GetInstance().Process(packetList.front());
+	packetList.pop();
+	return true;
 }
 
 bool PacketProcessor::SendPacket(const Packet& packet)

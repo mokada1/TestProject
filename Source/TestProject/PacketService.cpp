@@ -1,10 +1,5 @@
 ﻿#include "PacketService.h"
-#include "TP_generated.h"
-#include "TPUtil.h"
-
-#include <iostream>
-
-using namespace std;
+#include "ObjUser.h"
 
 void PacketService::Process(const Packet& packet)
 {
@@ -23,8 +18,9 @@ void PacketService::Process(const Packet& packet)
 	{
 		auto req = flatbuffers::GetRoot<TB_GameRoomObj>(packet.GetBody());
 		auto objUserList = req->ObjUserList();
-		if (objUserList)
+		if (objUserList && objUserList->size() > 0)
 		{
+			TArray<UObjUser*> resultObjList;
 			for (auto it = objUserList->begin(); it != objUserList->end(); ++it)
 			{
 				wchar_t wUserId[SIZE_USER_USER_ID], wPassword[SIZE_USER_PASSWORD];
@@ -32,11 +28,12 @@ void PacketService::Process(const Packet& packet)
 				TPUtil::GetInstance().MultiByteToWChar(wPassword, SIZE_USER_PASSWORD, it->Password()->c_str());
 				UE_LOG(LogTemp, Log, TEXT("UserId:%s Password:%s"), *FString(wUserId), *FString(wPassword));
 				UE_LOG(LogTemp, Log, TEXT("Location:%f,%f,%f"), it->UserLocation()->Location()->x(), it->UserLocation()->Location()->y(), it->UserLocation()->Location()->z());
+				auto newObjUser = UObjUser::Create(wUserId, wPassword);
+				auto newCompUserLocation = UCompUserLocation::Create(it->UserLocation()->Location()->x(), it->UserLocation()->Location()->y(), it->UserLocation()->Location()->z());
+				newObjUser->SetCompUserLocation(newCompUserLocation);
+				resultObjList.Add(newObjUser);
 			}
-			if (objUserList->size() > 0)
-			{
-				recvCallGameRoomObj();
-			}
+			recvCallGameRoomObj(resultObjList);
 		}	
 		break;
 	}
@@ -51,7 +48,10 @@ void PacketService::Process(const Packet& packet)
 			TPUtil::GetInstance().MultiByteToWChar(wPassword, SIZE_USER_PASSWORD, objUser->Password()->c_str());
 			UE_LOG(LogTemp, Log, TEXT("UserId:%s Password:%s"), *FString(wUserId), *FString(wPassword));
 			UE_LOG(LogTemp, Log, TEXT("Location:%f,%f,%f"), objUser->UserLocation()->Location()->x(), objUser->UserLocation()->Location()->y(), objUser->UserLocation()->Location()->z());
-			recvCallEnterGameRoom();
+			auto newObjUser = UObjUser::Create(wUserId, wPassword);
+			auto newCompUserLocation = UCompUserLocation::Create(objUser->UserLocation()->Location()->x(), objUser->UserLocation()->Location()->y(), objUser->UserLocation()->Location()->z());
+			newObjUser->SetCompUserLocation(newCompUserLocation);
+			recvCallEnterGameRoom(newObjUser);
 		}
 		break;
 	}
@@ -66,7 +66,7 @@ void PacketService::Process(const Packet& packet)
 			TPUtil::GetInstance().MultiByteToWChar(wPassword, SIZE_USER_PASSWORD, objUser->Password()->c_str());
 			UE_LOG(LogTemp, Log, TEXT("UserId:%s Password:%s"), *FString(wUserId), *FString(wPassword));
 			UE_LOG(LogTemp, Log, TEXT("Location:%f,%f,%f"), objUser->UserLocation()->Location()->x(), objUser->UserLocation()->Location()->y(), objUser->UserLocation()->Location()->z());
-			recvCallExitGameRoom();
+			recvCallExitGameRoom(FString(wUserId));
 		}
 		break;
 	}

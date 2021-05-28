@@ -99,6 +99,11 @@ bool ATPClient::Close()
     return true;
 }
 
+void ATPClient::ProcessPackets()
+{
+    while (PacketProcessor::GetInstance().Process());
+}
+
 bool ATPClient::SendPacket(const Packet& packet)
 {
     if (!rsThread)
