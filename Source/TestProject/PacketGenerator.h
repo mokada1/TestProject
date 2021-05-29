@@ -1,21 +1,27 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "TSingleton.h"
-#include "TP_generated.h"
 #include "Packet.h"
-#include <string.h>
+#include "TP_generated.h"
+#include <string>
 
 using namespace std;
 
-class TESTPROJECT_API PacketGenerator : public TSingleton<PacketGenerator>
+class Session;
+
+class PacketGenerator : public TSingleton<PacketGenerator>
 {
 public:
-	Packet Parse(char* const buffer, DWORD bytesTransferred);
-	Packet CreateReqLogin(const char* const userId, const char* const password);
+	Packet Parse(Session* const owner, char* const buffer, ULONG bytesTransferred);
 
-private:
-	void SetHeaderOfBuff(char* const buffer, PROTOCOL header);
+	Packet CreateReqLogin(const string& userId, const string& password);
+	
+private:	
 	Packet CreatePacket(flatbuffers::FlatBufferBuilder& _fbb, char* const buffer, PROTOCOL header);
+	PROTOCOL GetHeaderByBuff(char* const buffer);
+	PROTOCOL GetEndOfPacket(char* const buffer, const ULONG packetSize);
+	void SetHeaderOfBuff(char* const buffer, PROTOCOL header);
+	void SetEndOfBuff(char* const buffer, const int buffSize);
+	bool IsValidHeader(const PROTOCOL protocol);
+	bool IsValidEndOfPacket(const PROTOCOL protocol);
 };

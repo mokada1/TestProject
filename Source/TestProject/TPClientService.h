@@ -17,7 +17,7 @@ public:
 	bool ReqLogin(const FString& _userId, const FString& _password);
 
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = Network)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Network)
 	bool isLogined;
 
 	UPROPERTY(BlueprintReadOnly, Category = Network)

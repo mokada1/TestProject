@@ -1,7 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Packet.h"
+#include <cstring>
+
+using namespace std;
+
+Packet::Packet()
+{
+	Clear();
+}
 
 Packet::Packet(const Packet& rhs)
 {
@@ -27,19 +32,14 @@ Packet& Packet::operator=(Packet&& rhs) noexcept
 	return *this;
 }
 
-Packet::Packet()
+Packet::Packet(const PacketInfo& packetInfo, const PacketSubInfo& packetSubInfo)
 {
-	Init(nullptr, 0, PROTOCOL::TP_ERROR, true);
-}
-
-Packet::Packet(char* const _buffer, ULONG _packetSize, PROTOCOL _header)
-{
-	Init(_buffer, _packetSize, _header, true);
-}
-
-Packet::Packet(char* const _buffer, ULONG _packetSize, PROTOCOL _header, bool _isDAllocBuf)
-{
-	Init(_buffer, _packetSize, _header, _isDAllocBuf);
+	auto _buffer = packetInfo.GetBuffer();
+	this->header = packetInfo.GetHeader();
+	this->body = &_buffer[PACKET_HEAD_SIZE];
+	this->buffer = _buffer;
+	this->packetSize = packetInfo.GetPacketSize();
+	this->isDAllocBuf = packetSubInfo.GetIsDAllocBuf();
 }
 
 Packet::~Packet()
@@ -84,15 +84,6 @@ void Packet::Clear()
 	isDAllocBuf = false;
 }
 
-void Packet::Init(char* const _buffer, ULONG _packetSize, PROTOCOL _header, bool _isDAllocBuf)
-{
-	this->header = _header;
-	this->body = &_buffer[PACKET_HEAD_SIZE];
-	this->buffer = _buffer;
-	this->packetSize = _packetSize;
-	this->isDAllocBuf = _isDAllocBuf;
-}
-
 void Packet::Alloc(const Packet& rhs)
 {
 	if (!rhs.IsValid())
@@ -106,8 +97,8 @@ void Packet::Alloc(const Packet& rhs)
 	}
 	if (rhs.isDAllocBuf)
 	{
-		buffer = new char[BUFSIZE];
-		memcpy(buffer, rhs.buffer, BUFSIZE);
+		buffer = new char[BUFF_SIZE];
+		memcpy(buffer, rhs.buffer, BUFF_SIZE);
 		body = &buffer[PACKET_HEAD_SIZE];
 	}
 	else

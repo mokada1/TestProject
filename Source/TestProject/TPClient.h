@@ -5,6 +5,8 @@
 #include <cstdint>
 #include "TPClient.generated.h"
 
+class Session;
+
 UCLASS(BlueprintType, Blueprintable)
 class TESTPROJECT_API ATPClient : public AActor
 {
@@ -19,8 +21,10 @@ public:
 
 	bool SendPacket(const Packet& packet);
 
+	Session* GetSession() const;
+
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = Network)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Network)
 	bool isConnected;
 
 	UFUNCTION(BlueprintCallable, Category = TPClient)
@@ -33,7 +37,10 @@ private:
 
 	char* serverIp;
 	uint8_t serverPort;
+	
 	SOCKET hSocket;
 	SOCKADDR_IN recvAddr;
+	Session* session;
+
 	USocketRSThread* rsThread;
 };

@@ -4,6 +4,7 @@
 #include "TPUtil.h"
 #include "PacketService.h"
 #include "PacketProcessor.h"
+#include "Session.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -68,6 +69,8 @@ bool ATPClient::Connect()
         return false;
     }
 
+    session = new Session(hSocket, recvAddr);
+
     rsThread = NewObject<USocketRSThread>();
     rsThread->Start(hSocket);
     PacketProcessor::GetInstance().SetClient(this);
@@ -80,6 +83,11 @@ bool ATPClient::Connect()
 void ATPClient::CallEndPlay(const EEndPlayReason::Type endPlayReason)
 {
 	Close();
+    if (session)
+    {
+        delete session;
+        session = nullptr;
+    }
     PacketProcessor::GetInstance().SetClient(nullptr);
     isConnected = false;
 }
@@ -111,4 +119,9 @@ bool ATPClient::SendPacket(const Packet& packet)
         return false;
     }
 	return rsThread->SendPacket(packet);
+}
+
+Session* ATPClient::GetSession() const
+{
+    return session;
 }

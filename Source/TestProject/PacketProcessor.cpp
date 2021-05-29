@@ -10,7 +10,12 @@ void PacketProcessor::SetClient(ATPClient* const _client)
 
 void PacketProcessor::PushToPacketList(char* const buffer, const DWORD bytesTransferred)
 {
-	const auto& packet = PacketGenerator::GetInstance().Parse(buffer, bytesTransferred);
+	const auto& packet = PacketGenerator::GetInstance().Parse(client->GetSession(), buffer, bytesTransferred);
+	if (!packet.IsValid())
+	{
+		return;
+	}
+
 	packetList.push(packet);
 }
 

@@ -9,8 +9,8 @@ void PacketService::Process(const Packet& packet)
 	case PROTOCOL::TP_ERROR:
 	{
 		auto req = flatbuffers::GetRoot<TB_Error>(packet.GetBody());
-		wchar_t wMessage[BUFSIZE];
-		TPUtil::GetInstance().MultiByteToWChar(wMessage, BUFSIZE, req->Message()->c_str());
+		wchar_t wMessage[BUFF_SIZE];
+		TPUtil::GetInstance().MultiByteToWChar(wMessage, BUFF_SIZE, req->Message()->c_str());
 		recvCallError(FString(wMessage));
 		break;
 	}

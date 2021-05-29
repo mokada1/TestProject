@@ -1,23 +1,20 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
-#include "TPDefine.h"
 #include "Protocol.h"
+#include "TPDefine.h"
 
-/**
- * 
- */
+class PacketInfo;
+class PacketSubInfo;
+
 class Packet
 {
 public:
+	Packet();
 	Packet(const Packet& rhs);
 	Packet& operator=(const Packet& rhs);
 	Packet(Packet&& rhs) noexcept;
 	Packet& operator=(Packet&& rhs) noexcept;
-	Packet();
-	Packet(char* const _buffer, ULONG _packetSize, PROTOCOL _header);
-	Packet(char* const _buffer, ULONG _packetSize, PROTOCOL _header, bool _isDAllocBuf);
+	Packet(const PacketInfo& packetInfo, const PacketSubInfo& packetSubInfo);
 	~Packet();
 
 	PROTOCOL GetHeader() const;
@@ -29,12 +26,45 @@ public:
 	void Clear();
 
 private:
-	void Init(char* const _buffer, ULONG _packetSize, PROTOCOL _header, bool _isDAllocBuf);
 	void Alloc(const Packet& rhs);
 
 	PROTOCOL header;
 	char* body;
 	char* buffer;
 	ULONG packetSize;
+	bool isDAllocBuf;
+};
+
+class PacketInfo
+{
+public:
+	PacketInfo(char* const _buffer, ULONG _packetSize, PROTOCOL _header)
+	{
+		buffer = _buffer;
+		packetSize = _packetSize;
+		header = _header;
+	}
+
+	char* GetBuffer() const { return buffer; }
+	ULONG GetPacketSize() const { return packetSize; }
+	PROTOCOL GetHeader() const { return header; }
+
+private:
+	char* buffer;
+	ULONG packetSize;
+	PROTOCOL header;
+};
+
+class PacketSubInfo
+{
+public:
+	PacketSubInfo(bool _isDAllocBuf)
+	{
+		isDAllocBuf = _isDAllocBuf;
+	}
+
+	bool GetIsDAllocBuf() const { return isDAllocBuf; }
+
+private:
 	bool isDAllocBuf;
 };
