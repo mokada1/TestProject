@@ -5,6 +5,65 @@
 #include "PacketService.h"
 #include "PacketGenerator.h"
 #include "ObjUser.h"
+#include "TPCharacter.h"
+
+bool ATPClientService::ReqLogin(const FString& _userId, const FString& _password)
+{
+	if (isLogined)
+	{
+		return false;
+	}
+
+	TPUtil::GetInstance().WCharToMultiByte(hUserId, SIZE_USER_USER_ID, *_userId);
+	TPUtil::GetInstance().WCharToMultiByte(hPassword, SIZE_USER_PASSWORD, *_password);
+
+	auto packet = PacketGenerator::GetInstance().CreateReqLogin(hUserId, hPassword);
+	auto result = PacketProcessor::GetInstance().SendPacket(packet);
+
+	if (result)
+	{
+		propUserId = _userId;
+		propPassword = _password;
+	}
+
+	return result;
+}
+
+bool ATPClientService::ProcessReqMove(const float deltaMs)
+{
+	if (!isLogined)
+	{
+		return false;
+	}
+
+	auto location = playerCharacter->GetActorLocation();
+	if (playerLocationList.Num() == 0)
+	{
+		playerLocationList.Emplace(location);
+		totalDeltaMs = deltaMs;
+		return false;
+	}
+	
+	auto last = playerLocationList.Last();
+	if (last == location)
+	{
+		return false;
+	}
+
+	playerLocationList.Emplace(location);
+	totalDeltaMs += deltaMs;
+	
+	if (totalDeltaMs >= 0.2f)
+	{
+		auto packet = PacketGenerator::GetInstance().CreateReqMove(hUserId, playerLocationList);
+		auto result = PacketProcessor::GetInstance().SendPacket(packet);
+		playerLocationList.Empty();
+		totalDeltaMs = 0.f;
+		return result;
+	}
+	return false;
+}
+
 
 void ATPClientService::CallBeginPlay()
 {
@@ -23,6 +82,7 @@ void ATPClientService::SetRecvCallback()
 	PacketService::GetInstance().recvCallGameRoomObj += std::bind(&ATPClientService::CallGameRoomObj, this, std::placeholders::_1);
 	PacketService::GetInstance().recvCallEnterGameRoom += std::bind(&ATPClientService::CallEnterGameRoom, this, std::placeholders::_1);
 	PacketService::GetInstance().recvCallExitGameRoom += std::bind(&ATPClientService::CallExitGameRoom, this, std::placeholders::_1);
+	PacketService::GetInstance().recvCallMoveLocation += std::bind(&ATPClientService::CallMoveLocation, this, std::placeholders::_1, std::placeholders::_2);
 }
 
 void ATPClientService::ClearRecvCallback()
@@ -31,29 +91,7 @@ void ATPClientService::ClearRecvCallback()
 	PacketService::GetInstance().recvCallGameRoomObj.clear();
 	PacketService::GetInstance().recvCallEnterGameRoom.clear();
 	PacketService::GetInstance().recvCallExitGameRoom.clear();
-}
-
-bool ATPClientService::ReqLogin(const FString& _userId, const FString& _password)
-{
-	if (isLogined)
-	{
-		return false;
-	}
-	
-	char hUserId[SIZE_USER_USER_ID], hPassword[SIZE_USER_PASSWORD];
-	TPUtil::GetInstance().WCharToMultiByte(hUserId, SIZE_USER_USER_ID, *_userId);
-	TPUtil::GetInstance().WCharToMultiByte(hPassword, SIZE_USER_PASSWORD, *_password);
-
-	auto packet = PacketGenerator::GetInstance().CreateReqLogin(hUserId, hPassword);
-	auto result = PacketProcessor::GetInstance().SendPacket(packet);
-
-	if (result)
-	{
-		propUserId = _userId;
-		propPassword = _password;
-	}	
-
-	return result;
+	PacketService::GetInstance().recvCallMoveLocation.clear();
 }
 
 void ATPClientService::CallError(const FString& message)
@@ -78,4 +116,9 @@ void ATPClientService::CallEnterGameRoom(const UObjUser* const objUser)
 void ATPClientService::CallExitGameRoom(const FString& userId)
 {
 	K2_RecvCallExitGameRoom(userId);
+}
+
+void ATPClientService::CallMoveLocation(const FString& userId, const TArray<FVector>& locationList)
+{
+	K2_RecvCallMoveLocation(userId, locationList);
 }

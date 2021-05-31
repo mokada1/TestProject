@@ -125,6 +125,35 @@ Packet PacketGenerator::CreateReqLogin(const string& userId, const string& passw
 	return CreatePacket(fbb, buffer, header);
 }
 
+Packet PacketGenerator::CreateReqMove(const string& userId, const TArray<FVector>& locationList)
+{
+	auto buffer = new char[BUFF_SIZE];
+	memset(buffer, 0, BUFF_SIZE);
+
+	PROTOCOL header = PROTOCOL::REQ_MOVE;
+	SetHeaderOfBuff(buffer, header);
+
+	flatbuffers::FlatBufferBuilder fbb;
+
+	auto offsetUserId = fbb.CreateString(userId);
+
+	flatbuffers::Offset<flatbuffers::Vector<const ST_Vec3*>> offsetLocationList = 0;		
+	if (locationList.Num() > 0)
+	{				
+		vector<ST_Vec3> offsetListLocation;
+		for (auto location : locationList)
+		{			
+			ST_Vec3 stLocation(location.X, location.Y, location.Z);
+			offsetListLocation.push_back(stLocation);
+		}
+		offsetLocationList = fbb.CreateVectorOfStructs(offsetListLocation);
+	}
+
+	fbb.Finish(CreateTB_ReqMove(fbb, offsetUserId, offsetLocationList));
+
+	return CreatePacket(fbb, buffer, header);
+}
+
 Packet PacketGenerator::CreatePacket(flatbuffers::FlatBufferBuilder& _fbb, char* const buffer, PROTOCOL header)
 {
 	auto bp = _fbb.GetBufferPointer();

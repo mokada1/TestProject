@@ -70,6 +70,27 @@ void PacketService::Process(const Packet& packet)
 		}
 		break;
 	}
+	case PROTOCOL::MOVE_LOCATION:
+	{
+		auto req = flatbuffers::GetRoot<TB_MoveLocation>(packet.GetBody());
+		auto userId = req->UserId();
+		auto locationList = req->LocationList();
+		if (userId && locationList && locationList->size() > 0)
+		{
+			wchar_t wUserId[SIZE_USER_USER_ID];
+			TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, userId->c_str());
+
+			TArray<FVector> locationListFVector;
+			for (auto it = locationList->begin(); it != locationList->end(); ++it)
+			{
+				UE_LOG(LogTemp, Log, TEXT("MOVE_LOCATION Location:%f,%f,%f"), it->x(), it->y(), it->z());
+				FVector v(it->x(), it->y(), it->z());
+				locationListFVector.Add(v);
+			}
+			recvCallMoveLocation(FString(wUserId), locationListFVector);
+		}
+		break;
+	}
 	default:
 		break;
 	}

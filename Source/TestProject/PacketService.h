@@ -15,4 +15,5 @@ public:
 	Delegate<const TArray<UObjUser*>&> recvCallGameRoomObj;
 	Delegate<const UObjUser* const> recvCallEnterGameRoom;
 	Delegate<const FString&> recvCallExitGameRoom;
+	Delegate<const FString&, const TArray<FVector>&> recvCallMoveLocation;
 };

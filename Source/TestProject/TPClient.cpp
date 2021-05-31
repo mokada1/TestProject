@@ -98,7 +98,6 @@ bool ATPClient::Close()
 	{
         if (rsThread)
         {
-            rsThread->Stop();
             rsThread = nullptr;
         }
         closesocket(hSocket);

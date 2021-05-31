@@ -3,9 +3,11 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "TPDefine.h"
 #include "TPClientService.generated.h"
 
 class UObjUser;
+class ATPCharacter;
 
 UCLASS(BlueprintType, Blueprintable)
 class TESTPROJECT_API ATPClientService : public AActor
@@ -16,8 +18,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Network)
 	bool ReqLogin(const FString& _userId, const FString& _password);
 
+	UFUNCTION(BlueprintCallable, Category = Network)
+	bool ProcessReqMove(const float deltaMs);
+
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Network)
+	UPROPERTY(BlueprintReadWrite, Category = Network)
+	ATPCharacter* playerCharacter;
+
+	UPROPERTY(BlueprintReadOnly, Category = Network)
 	bool isLogined;
 
 	UPROPERTY(BlueprintReadOnly, Category = Network)
@@ -48,7 +56,16 @@ protected:
 	void K2_RecvCallExitGameRoom(const FString& userId);
 	void CallExitGameRoom(const FString& userId);
 
+	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallMoveLocation", meta = (ScriptName = "RecvCallMoveLocation"))
+	void K2_RecvCallMoveLocation(const FString& userId, const TArray<FVector>& locationList);
+	void CallMoveLocation(const FString& userId, const TArray<FVector>& locationList);
+
 private:
 	void SetRecvCallback();
 	void ClearRecvCallback();
+
+	char hUserId[SIZE_USER_USER_ID];
+	char hPassword[SIZE_USER_PASSWORD];
+	TArray<FVector> playerLocationList;
+	float totalDeltaMs;
 };

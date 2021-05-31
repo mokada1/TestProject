@@ -3,6 +3,11 @@
 #include "TPError.h"
 #include "PacketProcessor.h"
 
+bool USocketRSThread::Init()
+{
+	return true;
+}
+
 uint32 USocketRSThread::Run()
 {
 	while (!isStopThread)
@@ -16,8 +21,12 @@ uint32 USocketRSThread::Run()
 }
 
 void USocketRSThread::Stop()
-{
+{	
 	isStopThread = true;
+}
+
+void USocketRSThread::Exit()
+{
 }
 
 void USocketRSThread::Start(SOCKET socket)
@@ -33,13 +42,13 @@ bool USocketRSThread::SendPacket(const Packet& packet)
 	memset(&overlapped, 0, sizeof(overlapped));
 	overlapped.hEvent = wevent;
 
-	WSABUF dataBuf;
-	dataBuf.len = packet.GetPacketSize();
-	dataBuf.buf = packet.GetBuffer();
+	WSABUF wsaBuf;
+	wsaBuf.len = packet.GetPacketSize();
+	wsaBuf.buf = packet.GetBuffer();
 	DWORD sendBytes = 0;
 	DWORD flags = 0;
 
-	if (WSASend(hSocket, &dataBuf, 1, &sendBytes, 0, &overlapped, NULL) == SOCKET_ERROR)
+	if (WSASend(hSocket, &wsaBuf, 1, &sendBytes, 0, &overlapped, NULL) == SOCKET_ERROR)
 	{
 		auto e = WSAGetLastError();
 		if (e != WSA_IO_PENDING)
@@ -66,13 +75,13 @@ bool USocketRSThread::RecvPacket()
 	overlapped.hEvent = wevent;
 
 	char buffer[BUFF_SIZE];
-	WSABUF dataBuf;
-	dataBuf.len = BUFF_SIZE;
-	dataBuf.buf = buffer;
+	WSABUF wsaBuf;
+	wsaBuf.len = BUFF_SIZE;
+	wsaBuf.buf = buffer;
 	DWORD recvBytes = 0;
 	DWORD flags = 0;
 
-	if (WSARecv(hSocket, &dataBuf, 1, &recvBytes, &flags, &overlapped, NULL) == SOCKET_ERROR)
+	if (WSARecv(hSocket, &wsaBuf, 1, &recvBytes, &flags, &overlapped, NULL) == SOCKET_ERROR)
 	{
 		auto e = WSAGetLastError();
 		if (e != WSA_IO_PENDING)
@@ -90,7 +99,7 @@ bool USocketRSThread::RecvPacket()
 	
 	if (recvBytes > 0)
 	{
-		PacketProcessor::GetInstance().PushToPacketList(dataBuf.buf, recvBytes);
+		PacketProcessor::GetInstance().PushToPacketList(wsaBuf.buf, recvBytes);
 	}
 	return true;
 }

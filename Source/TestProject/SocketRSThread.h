@@ -18,10 +18,10 @@ class TESTPROJECT_API USocketRSThread : public UObject, public FRunnable
 	GENERATED_BODY()
 
 public:
-	virtual bool Init() override { return true; }
+	virtual bool Init() override;
 	virtual uint32 Run() override;
 	virtual void Stop() override;
-	virtual void Exit() override {}
+	virtual void Exit() override;
 
 	void Start(SOCKET socket);		
 	bool SendPacket(const Packet& packet);

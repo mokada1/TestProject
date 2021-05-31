@@ -24,7 +24,7 @@ public:
 	Session* GetSession() const;
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Network)
+	UPROPERTY(BlueprintReadOnly, Category = Network)
 	bool isConnected;
 
 	UFUNCTION(BlueprintCallable, Category = TPClient)
