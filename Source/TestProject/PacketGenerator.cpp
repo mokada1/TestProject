@@ -21,7 +21,7 @@ Packet PacketGenerator::Parse(Session* const owner, char* const buffer, ULONG by
 	if (ownerBuff)
 	{
 		// 최대 버퍼 크기를 넘는 경우 패킷 처리 안함
-		if (owner->GetPacketSize() + bytesTransferred > BUFF_SIZE)
+		if (owner->GetPacketSize() + bytesTransferred > MAX_BUFF_SIZE)
 		{
 			TPError::GetInstance().PrintError(L"Error:Invalid PacketSize");
 			owner->ClearBuff();
@@ -44,7 +44,7 @@ Packet PacketGenerator::Parse(Session* const owner, char* const buffer, ULONG by
 		if (!IsValidEndOfPacket(endOfPacket))
 		{
 			// 잘못된 EndOfPacket일 경우 패킷 처리 안함
-			if (ownerPacketSize == BUFF_SIZE)
+			if (ownerPacketSize == MAX_BUFF_SIZE)
 			{
 				TPError::GetInstance().PrintError(L"Error:Invalid EndOfPacket");
 				owner->ClearBuff();
@@ -79,7 +79,7 @@ Packet PacketGenerator::Parse(Session* const owner, char* const buffer, ULONG by
 			if (!IsValidEndOfPacket(endOfPacket))
 			{
 				// 잘못된 EndOfPacket일 경우 패킷 처리 안함
-				if (bytesTransferred == BUFF_SIZE)
+				if (bytesTransferred == MAX_BUFF_SIZE)
 				{
 					TPError::GetInstance().PrintError(L"Error:Invalid EndOfPacket");
 					return Packet();
@@ -110,29 +110,17 @@ Packet PacketGenerator::Parse(Session* const owner, char* const buffer, ULONG by
 
 Packet PacketGenerator::CreateReqLogin(const string& userId, const string& password)
 {
-	auto buffer = new char[BUFF_SIZE];
-	memset(buffer, 0, BUFF_SIZE);
-
-	PROTOCOL header = PROTOCOL::REQ_LOGIN;
-	SetHeaderOfBuff(buffer, header);
-
 	flatbuffers::FlatBufferBuilder fbb;
 
 	auto offsetUserId = fbb.CreateString(userId);
 	auto offsetPassword = fbb.CreateString(password);
 	fbb.Finish(CreateTB_ReqLogin(fbb, offsetUserId, offsetPassword));
 
-	return CreatePacket(fbb, buffer, header);
+	return CreatePacket(PROTOCOL::REQ_LOGIN, fbb);
 }
 
 Packet PacketGenerator::CreateReqMove(const string& userId, const TArray<FVector>& locationList)
 {
-	auto buffer = new char[BUFF_SIZE];
-	memset(buffer, 0, BUFF_SIZE);
-
-	PROTOCOL header = PROTOCOL::REQ_MOVE;
-	SetHeaderOfBuff(buffer, header);
-
 	flatbuffers::FlatBufferBuilder fbb;
 
 	auto offsetUserId = fbb.CreateString(userId);
@@ -151,21 +139,25 @@ Packet PacketGenerator::CreateReqMove(const string& userId, const TArray<FVector
 
 	fbb.Finish(CreateTB_ReqMove(fbb, offsetUserId, offsetLocationList));
 
-	return CreatePacket(fbb, buffer, header);
+	return CreatePacket(PROTOCOL::REQ_MOVE, fbb);
 }
 
-Packet PacketGenerator::CreatePacket(flatbuffers::FlatBufferBuilder& _fbb, char* const buffer, PROTOCOL header)
+Packet PacketGenerator::CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb)
 {
 	auto bp = _fbb.GetBufferPointer();
 	auto bSize = _fbb.GetSize();
-	memcpy(&buffer[PACKET_HEAD_SIZE], bp, bSize);
 
 	const int INTER_BUFFER_SIZE = PACKET_HEAD_SIZE + bSize;
+	const int BUFF_DATA_SIZE = PACKET_HEAD_SIZE + bSize + PACKET_END_SIZE;
+
+	auto buffer = new char[BUFF_DATA_SIZE];
+	memset(buffer, 0, BUFF_DATA_SIZE);
+
+	SetHeaderOfBuff(buffer, header);
+	memcpy(&buffer[PACKET_HEAD_SIZE], bp, bSize);
 	SetEndOfBuff(buffer, INTER_BUFFER_SIZE);
 
-	const int BUFFER_SIZE = PACKET_HEAD_SIZE + bSize + PACKET_END_SIZE;
-
-	auto packetInfo = PacketInfo(buffer, BUFFER_SIZE, header);
+	auto packetInfo = PacketInfo(buffer, BUFF_DATA_SIZE, header);
 	auto packetSubInfo = PacketSubInfo(true);
 	return Packet(packetInfo, packetSubInfo);
 }

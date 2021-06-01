@@ -18,7 +18,7 @@ public:
 	Packet CreateReqMove(const string& userId, const TArray<FVector>& locationList);
 	
 private:	
-	Packet CreatePacket(flatbuffers::FlatBufferBuilder& _fbb, char* const buffer, PROTOCOL header);
+	Packet CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb);
 	PROTOCOL GetHeaderByBuff(char* const buffer);
 	PROTOCOL GetEndOfPacket(char* const buffer, const ULONG packetSize);
 	void SetHeaderOfBuff(char* const buffer, PROTOCOL header);

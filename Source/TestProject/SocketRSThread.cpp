@@ -74,9 +74,9 @@ bool USocketRSThread::RecvPacket()
 	memset(&overlapped, 0, sizeof(overlapped));
 	overlapped.hEvent = wevent;
 
-	char buffer[BUFF_SIZE];
+	char buffer[MAX_BUFF_SIZE];
 	WSABUF wsaBuf;
-	wsaBuf.len = BUFF_SIZE;
+	wsaBuf.len = MAX_BUFF_SIZE;
 	wsaBuf.buf = buffer;
 	DWORD recvBytes = 0;
 	DWORD flags = 0;

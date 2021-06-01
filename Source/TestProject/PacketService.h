@@ -1,9 +1,9 @@
 #pragma once
 
 #include "TSingleton.h"
-#include "Packet.h"
 #include "Delegate.h"
 
+class Packet;
 class UObjUser;
 
 class PacketService : public TSingleton<PacketService>
