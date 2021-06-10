@@ -96,8 +96,9 @@ bool ATPClient::Close()
 {
 	if (hSocket)
 	{
-        if (rsThread)
+        if (rsThread && rsThread->IsRunning())
         {
+            rsThread->Stop();
             rsThread = nullptr;
         }
         closesocket(hSocket);
@@ -111,9 +112,14 @@ void ATPClient::ProcessPackets()
     while (PacketProcessor::GetInstance().Process());
 }
 
+bool ATPClient::GetIsConnected() const
+{
+    return isConnected;
+}
+
 bool ATPClient::SendPacket(const Packet& packet)
 {
-    if (!rsThread)
+    if (!rsThread || !rsThread->IsRunning())
     {
         return false;
     }

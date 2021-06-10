@@ -7,7 +7,7 @@
 
 using namespace std;
 
-Packet PacketGenerator::Parse(Session* const owner, char* const buffer, ULONG bytesTransferred)
+Packet PacketGenerator::Parse(Session* const owner, char* const buffer, const size_t bytesTransferred)
 {
 	if (bytesTransferred == 0)
 	{
@@ -16,8 +16,9 @@ Packet PacketGenerator::Parse(Session* const owner, char* const buffer, ULONG by
 
 	char* finishedBuffer = nullptr;
 	ULONG finishedPacketSize = 0;
+	bool isDAllocBuf = false;
 
-	auto const ownerBuff = owner->GetBuffer();
+	auto ownerBuff = owner->GetBuffer();
 	if (ownerBuff)
 	{
 		// 최대 버퍼 크기를 넘는 경우 패킷 처리 안함
@@ -29,6 +30,7 @@ Packet PacketGenerator::Parse(Session* const owner, char* const buffer, ULONG by
 		}
 
 		owner->AddToBuff(buffer, bytesTransferred);
+		ownerBuff = owner->GetBuffer();
 		const auto ownerPacketSize = owner->GetPacketSize();
 
 		const auto header = PacketGenerator::GetInstance().GetHeaderByBuff(ownerBuff);
@@ -57,6 +59,7 @@ Packet PacketGenerator::Parse(Session* const owner, char* const buffer, ULONG by
 			finishedBuffer = ownerBuff;
 			finishedPacketSize = ownerPacketSize;
 			owner->ClearBuff(false);
+			isDAllocBuf = true;
 		}
 	}
 	else
@@ -104,7 +107,7 @@ Packet PacketGenerator::Parse(Session* const owner, char* const buffer, ULONG by
 	// 완성된 패킷 리턴
 	PROTOCOL header = GetHeaderByBuff(finishedBuffer);
 	auto packetInfo = PacketInfo(finishedBuffer, finishedPacketSize, header);
-	auto packetSubInfo = PacketSubInfo(false);
+	auto packetSubInfo = PacketSubInfo(isDAllocBuf);
 	return Packet(packetInfo, packetSubInfo);
 }
 
@@ -170,7 +173,7 @@ PROTOCOL PacketGenerator::GetHeaderByBuff(char* const buffer)
 	return static_cast<PROTOCOL>(headerInt16);
 }
 
-PROTOCOL PacketGenerator::GetEndOfPacket(char* const buffer, const ULONG packetSize)
+PROTOCOL PacketGenerator::GetEndOfPacket(char* const buffer, const size_t packetSize)
 {
 	unsigned char byte1 = buffer[packetSize - 2];
 	unsigned char byte2 = buffer[packetSize - 1];
@@ -187,7 +190,7 @@ void PacketGenerator::SetHeaderOfBuff(char* const buffer, PROTOCOL header)
 	buffer[1] = byte2;
 }
 
-void PacketGenerator::SetEndOfBuff(char* const buffer, const int buffSize)
+void PacketGenerator::SetEndOfBuff(char* const buffer, const size_t buffSize)
 {
 	uint16_t protoInt16 = static_cast<uint16_t>(PROTOCOL::END_OF_PACKET);
 	unsigned char byte1 = protoInt16 & 0xFF;

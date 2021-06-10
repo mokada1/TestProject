@@ -64,6 +64,11 @@ bool ATPClientService::ProcessReqMove(const float deltaMs)
 	return false;
 }
 
+bool ATPClientService::GetIsLogined() const
+{
+	return isLogined;
+}
+
 
 void ATPClientService::CallBeginPlay()
 {

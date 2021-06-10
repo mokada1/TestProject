@@ -3,19 +3,26 @@
 #include "TPError.h"
 #include "PacketProcessor.h"
 
+USocketRSThread::~USocketRSThread()
+{
+	if (IsRunning())
+	{
+		thread->Kill(true);
+		thread = nullptr;
+	}
+}
+
 bool USocketRSThread::Init()
 {
+	isStopThread = false;
 	return true;
 }
 
 uint32 USocketRSThread::Run()
-{
+{	
 	while (!isStopThread)
 	{
-		if (!RecvPacket())
-		{
-			break;
-		}
+		RecvPacket();
 	}
 	return 0;
 }
@@ -29,10 +36,15 @@ void USocketRSThread::Exit()
 {
 }
 
+bool USocketRSThread::IsRunning()
+{	
+	return thread && !isStopThread;
+}
+
 void USocketRSThread::Start(SOCKET socket)
 {
 	this->hSocket = socket;
-	FRunnableThread::Create(this, TEXT("USocketRSThread"));
+	thread = FRunnableThread::Create(this, TEXT("USocketRSThread"));
 }
 
 bool USocketRSThread::SendPacket(const Packet& packet)
@@ -43,7 +55,7 @@ bool USocketRSThread::SendPacket(const Packet& packet)
 	overlapped.hEvent = wevent;
 
 	WSABUF wsaBuf;
-	wsaBuf.len = packet.GetPacketSize();
+	wsaBuf.len = static_cast<ULONG>(packet.GetPacketSize());
 	wsaBuf.buf = packet.GetBuffer();
 	DWORD sendBytes = 0;
 	DWORD flags = 0;
@@ -99,7 +111,7 @@ bool USocketRSThread::RecvPacket()
 	
 	if (recvBytes > 0)
 	{
-		PacketProcessor::GetInstance().PushToPacketList(wsaBuf.buf, recvBytes);
+		PacketProcessor::GetInstance().PushToPacketList(wsaBuf.buf, static_cast<size_t>(recvBytes));
 	}
 	return true;
 }

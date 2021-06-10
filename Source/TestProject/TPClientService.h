@@ -21,12 +21,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Network)
 	bool ProcessReqMove(const float deltaMs);
 
+	UFUNCTION(BlueprintCallable, Category = Network)
+	bool GetIsLogined() const;
+
 protected:
 	UPROPERTY(BlueprintReadWrite, Category = Network)
 	ATPCharacter* playerCharacter;
-
-	UPROPERTY(BlueprintReadOnly, Category = Network)
-	bool isLogined;
 
 	UPROPERTY(BlueprintReadOnly, Category = Network)
 	FString propUserId;
@@ -63,6 +63,8 @@ protected:
 private:
 	void SetRecvCallback();
 	void ClearRecvCallback();
+
+	bool isLogined;
 
 	char hUserId[SIZE_USER_USER_ID];
 	char hPassword[SIZE_USER_PASSWORD];

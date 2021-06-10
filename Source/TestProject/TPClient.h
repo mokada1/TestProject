@@ -19,14 +19,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Network)
 	void ProcessPackets();
 
+	UFUNCTION(BlueprintCallable, Category = Network)
+	bool GetIsConnected() const;
+
 	bool SendPacket(const Packet& packet);
 
 	Session* GetSession() const;
 
-protected:
-	UPROPERTY(BlueprintReadOnly, Category = Network)
-	bool isConnected;
-
+protected:	
 	UFUNCTION(BlueprintCallable, Category = TPClient)
 	void CallEndPlay(const EEndPlayReason::Type endPlayReason);
 
@@ -35,6 +35,8 @@ private:
 	bool Connect();
 	bool Close();	
 
+	bool isConnected;
+
 	char* serverIp;
 	uint8_t serverPort;
 	
@@ -42,5 +44,6 @@ private:
 	SOCKADDR_IN recvAddr;
 	Session* session;
 
+	UPROPERTY()
 	USocketRSThread* rsThread;
 };

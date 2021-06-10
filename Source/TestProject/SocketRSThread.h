@@ -18,6 +18,8 @@ class TESTPROJECT_API USocketRSThread : public UObject, public FRunnable
 	GENERATED_BODY()
 
 public:
+	~USocketRSThread();
+
 	virtual bool Init() override;
 	virtual uint32 Run() override;
 	virtual void Stop() override;
@@ -26,6 +28,7 @@ public:
 	void Start(SOCKET socket);		
 	bool SendPacket(const Packet& packet);
 
+	bool IsRunning();
 private:
 	bool RecvPacket();
 	
@@ -33,4 +36,5 @@ private:
 	SOCKET hSocket;
 
 	bool isStopThread;
+	FRunnableThread* thread;
 };

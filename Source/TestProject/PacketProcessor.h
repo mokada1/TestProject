@@ -12,7 +12,7 @@ class PacketProcessor : public TSingleton<PacketProcessor>
 {
 public:
 	void SetClient(ATPClient* const _client);
-	void PushToPacketList(char* const buffer, const DWORD bytesTransferred);
+	void PushToPacketList(char* const buffer, const size_t bytesTransferred);
 	bool Process();
 	bool SendPacket(const Packet& packet);
 

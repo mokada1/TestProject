@@ -8,7 +8,7 @@ void PacketProcessor::SetClient(ATPClient* const _client)
 	client = _client;
 }
 
-void PacketProcessor::PushToPacketList(char* const buffer, const DWORD bytesTransferred)
+void PacketProcessor::PushToPacketList(char* const buffer, const size_t bytesTransferred)
 {
 	const auto& packet = PacketGenerator::GetInstance().Parse(client->GetSession(), buffer, bytesTransferred);
 	if (!packet.IsValid())
