@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Enums.h"
+#include "../Util/Enums.h"
 #include "Components/ActorComponent.h"
 #include "CharacterAttributeComponent.generated.h"
 

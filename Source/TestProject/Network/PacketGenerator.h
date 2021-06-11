@@ -1,8 +1,8 @@
 #pragma once
 
-#include "TSingleton.h"
-#include "Packet.h"
-#include "TP_generated.h"
+#include "../Util/TSingleton.h"
+#include "../Network/Packet.h"
+#include "../TP_generated.h"
 #include <string>
 
 using namespace std;

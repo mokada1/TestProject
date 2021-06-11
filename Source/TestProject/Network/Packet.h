@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Protocol.h"
-#include "TPDefine.h"
+#include "../Util/TPDefine.h"
 
 class PacketInfo;
 class PacketSubInfo;

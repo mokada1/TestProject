@@ -4,8 +4,8 @@
 #include "PacketProcessor.h"
 #include "PacketService.h"
 #include "PacketGenerator.h"
-#include "ObjUser.h"
-#include "TPCharacter.h"
+#include "../Object/ObjUser.h"
+#include "../Core/TPCharacter.h"
 
 bool ATPClientService::ReqLogin(const FString& _userId, const FString& _password)
 {

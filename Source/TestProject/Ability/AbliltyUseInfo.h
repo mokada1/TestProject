@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Enums.h"
+#include "../Util/Enums.h"
 #include "UObject/Object.h"
 #include "AbliltyUseInfo.generated.h"
 

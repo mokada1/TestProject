@@ -3,7 +3,7 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-#include "TPDefine.h"
+#include "../Util/TPDefine.h"
 #include "TPClientService.generated.h"
 
 class UObjUser;

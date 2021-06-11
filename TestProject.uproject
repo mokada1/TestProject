@@ -13,6 +13,11 @@
 				"GameplayAbilities",
 				"CoreUObject"
 			]
+		},
+		{
+			"Name": "TestProjectEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
 		}
 	],
 	"TargetPlatforms": [

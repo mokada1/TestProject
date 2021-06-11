@@ -1,7 +1,7 @@
 #pragma once
 
-#include "TSingleton.h"
-#include "Delegate.h"
+#include "../Util/TSingleton.h"
+#include "../Util/Delegate.h"
 
 class Packet;
 class UObjUser;

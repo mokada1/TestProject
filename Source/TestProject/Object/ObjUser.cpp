@@ -1,5 +1,5 @@
 #include "ObjUser.h"
-#include "TPDefine.h"
+#include "../Util/TPDefine.h"
 #include <wchar.h>
 
 FString UObjUser::BP_GetUserId() const

@@ -1,6 +1,6 @@
 #include "SocketRSThread.h"
-#include "TP_generated.h"
-#include "TPError.h"
+#include "../TP_generated.h"
+#include "../Util/TPError.h"
 #include "PacketProcessor.h"
 
 USocketRSThread::~USocketRSThread()

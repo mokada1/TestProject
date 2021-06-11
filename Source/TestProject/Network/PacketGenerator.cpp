@@ -1,7 +1,7 @@
 #include "PacketGenerator.h"
 #include "Session.h"
-#include "TP_generated.h"
-#include "TPError.h"
+#include "../TP_generated.h"
+#include "../Util/TPError.h"
 
 #include <iostream>
 

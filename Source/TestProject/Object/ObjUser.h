@@ -1,7 +1,7 @@
 #pragma once
 
 #include "TPObject.h"
-#include "CompUserLocation.h"
+#include "../Component/CompUserLocation.h"
 #include "ObjUser.generated.h"
 
 UCLASS(BlueprintType)

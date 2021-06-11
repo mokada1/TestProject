@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "TPUtil.h"
+#include "../Util/TPUtil.h"
 #include "CharacterAbility.h"
 #include "Components/ActorComponent.h"
 #include "CharacterAbilityComponent.generated.h"

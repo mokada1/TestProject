@@ -9,6 +9,6 @@ public class TestProjectTarget : TargetRules
 	{
 		Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
-		ExtraModuleNames.Add("TestProject");
+		ExtraModuleNames.AddRange(new string[] { "TestProject", "TestProjectEditor" });
 	}
 }
