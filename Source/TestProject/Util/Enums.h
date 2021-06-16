@@ -36,3 +36,11 @@ enum class EAlly : uint8
 	Enemy		UMETA(DisplayName = "Enemy"),
 	Friend		UMETA(DisplayName = "Friend"),
 };
+
+UENUM(BlueprintType)
+enum class EOpMove : uint8
+{
+	Start		UMETA(DisplayName = "Start"),
+	Change		UMETA(DisplayName = "Change"),
+	End			UMETA(DisplayName = "End"),
+};

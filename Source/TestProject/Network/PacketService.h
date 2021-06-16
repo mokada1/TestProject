@@ -2,6 +2,7 @@
 
 #include "../Util/TSingleton.h"
 #include "../Util/Delegate.h"
+#include "Struct/BcastMove.h"
 
 class Packet;
 class UObjUser;
@@ -12,8 +13,8 @@ public:
 	void Process(const Packet& packet);
 
 	Delegate<const FString&> recvCallError;
-	Delegate<const TArray<UObjUser*>&> recvCallGameRoomObj;
-	Delegate<const UObjUser* const> recvCallEnterGameRoom;
-	Delegate<const FString&> recvCallExitGameRoom;
-	Delegate<const FString&, const TArray<FVector>&> recvCallMoveLocation;
+	Delegate<const TArray<UObjUser*>&> recvCallResLogin;
+	Delegate<const UObjUser* const> recvCallBcastEnterGameRoom;
+	Delegate<const FString&> recvCallBcastExitGameRoom;
+	Delegate<const FBcastMove&> recvCallBcastMove;
 };

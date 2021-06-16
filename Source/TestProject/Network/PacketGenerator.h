@@ -3,6 +3,7 @@
 #include "../Util/TSingleton.h"
 #include "../Network/Packet.h"
 #include "../TP_generated.h"
+#include "Struct/BcastMove.h"
 #include <string>
 
 using namespace std;
@@ -15,7 +16,7 @@ public:
 	Packet Parse(Session* const owner, char* const buffer, const size_t bytesTransferred);
 
 	Packet CreateReqLogin(const string& userId, const string& password);
-	Packet CreateReqMove(const string& userId, const TArray<FVector>& locationList);
+	Packet CreateReqMove(FBcastMove& moveLocation);
 	
 private:	
 	Packet CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb);

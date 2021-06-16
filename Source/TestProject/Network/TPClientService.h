@@ -4,6 +4,7 @@
 
 #include "GameFramework/Actor.h"
 #include "../Util/TPDefine.h"
+#include "Struct/BcastMove.h"
 #include "TPClientService.generated.h"
 
 class UObjUser;
@@ -19,15 +20,12 @@ public:
 	bool ReqLogin(const FString& _userId, const FString& _password);
 
 	UFUNCTION(BlueprintCallable, Category = Network)
-	bool ProcessReqMove(const float deltaMs);
+	bool ProcessReqMove(const EOpMove operation, const FInputMove& inputMove);
 
 	UFUNCTION(BlueprintCallable, Category = Network)
 	bool GetIsLogined() const;
 
 protected:
-	UPROPERTY(BlueprintReadWrite, Category = Network)
-	ATPCharacter* playerCharacter;
-
 	UPROPERTY(BlueprintReadOnly, Category = Network)
 	FString propUserId;
 
@@ -44,21 +42,21 @@ protected:
 	void K2_RecvCallError(const FString& message);
 	void CallError(const FString& message);
 
-	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallGameRoomObj", meta = (ScriptName = "RecvCallGameRoomObj"))
-	void K2_RecvCallGameRoomObj(const TArray<UObjUser*>& objUserList);
-	void CallGameRoomObj(const TArray<UObjUser*>& objUserList);
+	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallResLogin", meta = (ScriptName = "RecvCallResLogin"))
+	void K2_RecvCallResLogin(const TArray<UObjUser*>& objUserList);
+	void CallResLogin(const TArray<UObjUser*>& objUserList);
 
-	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallEnterGameRoom", meta = (ScriptName = "RecvCallEnterGameRoom"))
-	void K2_RecvCallEnterGameRoom(const UObjUser* const objUser);
-	void CallEnterGameRoom(const UObjUser* const objUser);
+	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastEnterGameRoom", meta = (ScriptName = "RecvCallBcastEnterGameRoom"))
+	void K2_RecvCallBcastEnterGameRoom(const UObjUser* const objUser);
+	void CallBcastEnterGameRoom(const UObjUser* const objUser);
 
-	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallExitGameRoom", meta = (ScriptName = "RecvCallExitGameRoom"))
-	void K2_RecvCallExitGameRoom(const FString& userId);
-	void CallExitGameRoom(const FString& userId);
+	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastExitGameRoom", meta = (ScriptName = "RecvCallBcastExitGameRoom"))
+	void K2_RecvCallBcastExitGameRoom(const FString& userId);
+	void CallBcastExitGameRoom(const FString& userId);
 
-	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallMoveLocation", meta = (ScriptName = "RecvCallMoveLocation"))
-	void K2_RecvCallMoveLocation(const FString& userId, const TArray<FVector>& locationList);
-	void CallMoveLocation(const FString& userId, const TArray<FVector>& locationList);
+	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastMove", meta = (ScriptName = "RecvCallBcastMove"))
+	void K2_RecvCallBcastMove(const FBcastMove& bcastMove);
+	void CallBcastMove(const FBcastMove& bcastMove);
 
 private:
 	void SetRecvCallback();
@@ -68,6 +66,4 @@ private:
 
 	char hUserId[SIZE_USER_USER_ID];
 	char hPassword[SIZE_USER_PASSWORD];
-	TArray<FVector> playerLocationList;
-	float totalDeltaMs;
 };

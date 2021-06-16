@@ -29,39 +29,19 @@ bool ATPClientService::ReqLogin(const FString& _userId, const FString& _password
 	return result;
 }
 
-bool ATPClientService::ProcessReqMove(const float deltaMs)
+bool ATPClientService::ProcessReqMove(const EOpMove operation, const FInputMove& inputMove)
 {
 	if (!isLogined)
 	{
 		return false;
 	}
+		
+	FBcastMove bcastMove(propUserId, operation, inputMove);
 
-	auto location = playerCharacter->GetActorLocation();
-	if (playerLocationList.Num() == 0)
-	{
-		playerLocationList.Emplace(location);
-		totalDeltaMs = deltaMs;
-		return false;
-	}
-	
-	auto last = playerLocationList.Last();
-	if (last == location)
-	{
-		return false;
-	}
+	auto packet = PacketGenerator::GetInstance().CreateReqMove(bcastMove);
+	auto result = PacketProcessor::GetInstance().SendPacket(packet);
 
-	playerLocationList.Emplace(location);
-	totalDeltaMs += deltaMs;
-	
-	if (totalDeltaMs >= 0.2f)
-	{
-		auto packet = PacketGenerator::GetInstance().CreateReqMove(hUserId, playerLocationList);
-		auto result = PacketProcessor::GetInstance().SendPacket(packet);
-		playerLocationList.Empty();
-		totalDeltaMs = 0.f;
-		return result;
-	}
-	return false;
+	return result;
 }
 
 bool ATPClientService::GetIsLogined() const
@@ -84,19 +64,19 @@ void ATPClientService::CallEndPlay(const EEndPlayReason::Type EndPlayReason)
 void ATPClientService::SetRecvCallback()
 {
 	PacketService::GetInstance().recvCallError += std::bind(&ATPClientService::CallError, this, std::placeholders::_1);
-	PacketService::GetInstance().recvCallGameRoomObj += std::bind(&ATPClientService::CallGameRoomObj, this, std::placeholders::_1);
-	PacketService::GetInstance().recvCallEnterGameRoom += std::bind(&ATPClientService::CallEnterGameRoom, this, std::placeholders::_1);
-	PacketService::GetInstance().recvCallExitGameRoom += std::bind(&ATPClientService::CallExitGameRoom, this, std::placeholders::_1);
-	PacketService::GetInstance().recvCallMoveLocation += std::bind(&ATPClientService::CallMoveLocation, this, std::placeholders::_1, std::placeholders::_2);
+	PacketService::GetInstance().recvCallResLogin += std::bind(&ATPClientService::CallResLogin, this, std::placeholders::_1);
+	PacketService::GetInstance().recvCallBcastEnterGameRoom += std::bind(&ATPClientService::CallBcastEnterGameRoom, this, std::placeholders::_1);
+	PacketService::GetInstance().recvCallBcastExitGameRoom += std::bind(&ATPClientService::CallBcastExitGameRoom, this, std::placeholders::_1);
+	PacketService::GetInstance().recvCallBcastMove += std::bind(&ATPClientService::CallBcastMove, this, std::placeholders::_1);
 }
 
 void ATPClientService::ClearRecvCallback()
 {
 	PacketService::GetInstance().recvCallError.clear();
-	PacketService::GetInstance().recvCallGameRoomObj.clear();
-	PacketService::GetInstance().recvCallEnterGameRoom.clear();
-	PacketService::GetInstance().recvCallExitGameRoom.clear();
-	PacketService::GetInstance().recvCallMoveLocation.clear();
+	PacketService::GetInstance().recvCallResLogin.clear();
+	PacketService::GetInstance().recvCallBcastEnterGameRoom.clear();
+	PacketService::GetInstance().recvCallBcastExitGameRoom.clear();
+	PacketService::GetInstance().recvCallBcastMove.clear();
 }
 
 void ATPClientService::CallError(const FString& message)
@@ -104,26 +84,26 @@ void ATPClientService::CallError(const FString& message)
 	K2_RecvCallError(message);
 }
 
-void ATPClientService::CallGameRoomObj(const TArray<UObjUser*>& objUserList)
+void ATPClientService::CallResLogin(const TArray<UObjUser*>& objUserList)
 {
 	if (!isLogined)
 	{
 		isLogined = true;
 	}
-	K2_RecvCallGameRoomObj(objUserList);
+	K2_RecvCallResLogin(objUserList);
 }
 
-void ATPClientService::CallEnterGameRoom(const UObjUser* const objUser)
+void ATPClientService::CallBcastEnterGameRoom(const UObjUser* const objUser)
 {
-	K2_RecvCallEnterGameRoom(objUser);
+	K2_RecvCallBcastEnterGameRoom(objUser);
 }
 
-void ATPClientService::CallExitGameRoom(const FString& userId)
+void ATPClientService::CallBcastExitGameRoom(const FString& userId)
 {
-	K2_RecvCallExitGameRoom(userId);
+	K2_RecvCallBcastExitGameRoom(userId);
 }
 
-void ATPClientService::CallMoveLocation(const FString& userId, const TArray<FVector>& locationList)
+void ATPClientService::CallBcastMove(const FBcastMove& bcastMove)
 {
-	K2_RecvCallMoveLocation(userId, locationList);
+	K2_RecvCallBcastMove(bcastMove);
 }

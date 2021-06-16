@@ -15,9 +15,9 @@ void PacketService::Process(const Packet& packet)
 		recvCallError(FString(wMessage));
 		break;
 	}
-	case PROTOCOL::GAME_ROOM_OBJ:
+	case PROTOCOL::RES_LOGIN:
 	{
-		auto req = flatbuffers::GetRoot<TB_GameRoomObj>(packet.GetBody());
+		auto req = flatbuffers::GetRoot<TB_ResLogin>(packet.GetBody());
 		auto objUserList = req->ObjUserList();
 		if (objUserList && objUserList->size() > 0)
 		{
@@ -34,13 +34,13 @@ void PacketService::Process(const Packet& packet)
 				newObjUser->SetCompUserLocation(newCompUserLocation);
 				resultObjList.Add(newObjUser);
 			}
-			recvCallGameRoomObj(resultObjList);
+			recvCallResLogin(resultObjList);
 		}	
 		break;
 	}
-	case PROTOCOL::ENTER_GAME_ROOM:
+	case PROTOCOL::BCAST_ENTER_GAME_ROOM:
 	{
-		auto req = flatbuffers::GetRoot<TB_EnterGameRoom>(packet.GetBody());
+		auto req = flatbuffers::GetRoot<TB_BcastEnterGameRoom>(packet.GetBody());
 		auto objUser = req->ObjUser();
 		if (objUser)
 		{
@@ -52,13 +52,13 @@ void PacketService::Process(const Packet& packet)
 			auto newObjUser = UObjUser::Create(wUserId, wPassword);
 			auto newCompUserLocation = UCompUserLocation::Create(objUser->UserLocation()->Location()->x(), objUser->UserLocation()->Location()->y(), objUser->UserLocation()->Location()->z());
 			newObjUser->SetCompUserLocation(newCompUserLocation);
-			recvCallEnterGameRoom(newObjUser);
+			recvCallBcastEnterGameRoom(newObjUser);
 		}
 		break;
 	}
-	case PROTOCOL::EXIT_GAME_ROOM:
+	case PROTOCOL::BCAST_EXIT_GAME_ROOM:
 	{
-		auto req = flatbuffers::GetRoot<TB_ExitGameRoom>(packet.GetBody());
+		auto req = flatbuffers::GetRoot<TB_BcastExitGameRoom>(packet.GetBody());
 		auto objUser = req->ObjUser();
 		if (objUser)
 		{
@@ -67,29 +67,26 @@ void PacketService::Process(const Packet& packet)
 			TPUtil::GetInstance().MultiByteToWChar(wPassword, SIZE_USER_PASSWORD, objUser->Password()->c_str());
 			UE_LOG(LogTemp, Log, TEXT("UserId:%s Password:%s"), *FString(wUserId), *FString(wPassword));
 			UE_LOG(LogTemp, Log, TEXT("Location:%f,%f,%f"), objUser->UserLocation()->Location()->x(), objUser->UserLocation()->Location()->y(), objUser->UserLocation()->Location()->z());
-			recvCallExitGameRoom(FString(wUserId));
+			recvCallBcastExitGameRoom(FString(wUserId));
 		}
 		break;
 	}
-	case PROTOCOL::MOVE_LOCATION:
+	case PROTOCOL::BCAST_MOVE:
 	{
-		auto req = flatbuffers::GetRoot<TB_MoveLocation>(packet.GetBody());
-		auto userId = req->UserId();
-		auto locationList = req->LocationList();
-		if (userId && locationList && locationList->size() > 0)
-		{
-			wchar_t wUserId[SIZE_USER_USER_ID];
-			TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, userId->c_str());
+		auto req = flatbuffers::GetRoot<TB_BcastMove>(packet.GetBody());
+		auto userId = req->UserId()->c_str();
+		auto inputMove = req->InputMove();
 
-			TArray<FVector> locationListFVector;
-			for (auto it = locationList->begin(); it != locationList->end(); ++it)
-			{
-				UE_LOG(LogTemp, Log, TEXT("MOVE_LOCATION Location:%f,%f,%f"), it->x(), it->y(), it->z());
-				FVector v(it->x(), it->y(), it->z());
-				locationListFVector.Add(v);
-			}
-			recvCallMoveLocation(FString(wUserId), locationListFVector);
-		}
+		wchar_t wUserId[SIZE_USER_USER_ID];
+		TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, userId);
+	
+		recvCallBcastMove(FBcastMove(*req));
+		break;
+	}
+	case PROTOCOL::BCAST_LOCATION_SYNC:
+	{
+		auto req = flatbuffers::GetRoot<TB_BcastLocationSync>(packet.GetBody());
+		auto userId = req->UserId()->c_str();
 		break;
 	}
 	default:

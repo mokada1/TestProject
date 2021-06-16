@@ -122,25 +122,18 @@ Packet PacketGenerator::CreateReqLogin(const string& userId, const string& passw
 	return CreatePacket(PROTOCOL::REQ_LOGIN, fbb);
 }
 
-Packet PacketGenerator::CreateReqMove(const string& userId, const TArray<FVector>& locationList)
+Packet PacketGenerator::CreateReqMove(FBcastMove& moveLocation)
 {
+	char hUserId[SIZE_USER_USER_ID];
+	TPUtil::GetInstance().WCharToMultiByte(hUserId, SIZE_USER_USER_ID, *(moveLocation.userId));
+
 	flatbuffers::FlatBufferBuilder fbb;
 
-	auto offsetUserId = fbb.CreateString(userId);
+	auto offsetUserId = fbb.CreateString(hUserId);
+	auto offsetOperation = moveLocation.GetOffsetOperation();
+	auto offsetInputMove = moveLocation.inputMove.Serialize(fbb);
 
-	flatbuffers::Offset<flatbuffers::Vector<const ST_Vec3*>> offsetLocationList = 0;		
-	if (locationList.Num() > 0)
-	{				
-		vector<ST_Vec3> offsetListLocation;
-		for (auto location : locationList)
-		{			
-			ST_Vec3 stLocation(location.X, location.Y, location.Z);
-			offsetListLocation.push_back(stLocation);
-		}
-		offsetLocationList = fbb.CreateVectorOfStructs(offsetListLocation);
-	}
-
-	fbb.Finish(CreateTB_ReqMove(fbb, offsetUserId, offsetLocationList));
+	fbb.Finish(CreateTB_ReqMove(fbb, offsetUserId, offsetOperation, offsetInputMove));
 
 	return CreatePacket(PROTOCOL::REQ_MOVE, fbb);
 }
@@ -206,10 +199,11 @@ bool PacketGenerator::IsValidHeader(const PROTOCOL protocol)
 	case PROTOCOL::TP_ERROR:
 	case PROTOCOL::REQ_LOGIN:
 	case PROTOCOL::REQ_MOVE:
-	case PROTOCOL::GAME_ROOM_OBJ:
-	case PROTOCOL::ENTER_GAME_ROOM:
-	case PROTOCOL::EXIT_GAME_ROOM:
-	case PROTOCOL::MOVE_LOCATION:
+	case PROTOCOL::RES_LOGIN:
+	case PROTOCOL::BCAST_ENTER_GAME_ROOM:
+	case PROTOCOL::BCAST_EXIT_GAME_ROOM:
+	case PROTOCOL::BCAST_MOVE:
+	case PROTOCOL::BCAST_LOCATION_SYNC:
 		return true;
 	}
 	return false;
