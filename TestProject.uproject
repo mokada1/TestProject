@@ -15,6 +15,12 @@
 			]
 		}
 	],
+	"Plugins": [
+		{
+			"Name": "TestPlugins",
+			"Enabled": false
+		}
+	],
 	"TargetPlatforms": [
 		"WindowsNoEditor",
 		"WindowsNoEditorWin32"

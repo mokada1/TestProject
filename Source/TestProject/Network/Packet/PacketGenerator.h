@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../Util/TSingleton.h"
-#include "../Network/Packet.h"
-#include "../TP_generated.h"
-#include "Struct/BcastMove.h"
+#include "../../Util/TSingleton.h"
+#include "Packet.h"
+#include "../../TP_generated.h"
+#include "../Struct/BcastMove.h"
 #include <string>
 
 using namespace std;
@@ -17,6 +17,7 @@ public:
 
 	Packet CreateReqLogin(const string& userId, const string& password);
 	Packet CreateReqMove(FBcastMove& moveLocation);
+	Packet CreateReqMoveSync(const string& userId, const FVector& location);
 	
 private:	
 	Packet CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb);

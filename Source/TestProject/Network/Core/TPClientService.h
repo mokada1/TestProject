@@ -3,8 +3,8 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-#include "../Util/TPDefine.h"
-#include "Struct/BcastMove.h"
+#include "../../Util/TPDefine.h"
+#include "../Struct/BcastMove.h"
 #include "TPClientService.generated.h"
 
 class UObjUser;
@@ -20,7 +20,10 @@ public:
 	bool ReqLogin(const FString& _userId, const FString& _password);
 
 	UFUNCTION(BlueprintCallable, Category = Network)
-	bool ProcessReqMove(const EOpMove operation, const FInputMove& inputMove);
+	bool ReqMove(const EOpMove operation, const FInputMove& inputMove);
+
+	UFUNCTION(BlueprintCallable, Category = Network)
+	bool ReqMoveSync(const FVector& location);
 
 	UFUNCTION(BlueprintCallable, Category = Network)
 	bool GetIsLogined() const;
@@ -57,6 +60,10 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastMove", meta = (ScriptName = "RecvCallBcastMove"))
 	void K2_RecvCallBcastMove(const FBcastMove& bcastMove);
 	void CallBcastMove(const FBcastMove& bcastMove);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastLocationSync", meta = (ScriptName = "RecvCallBcastLocationSync"))
+	void K2_RecvCallBcastLocationSync(const FString& userId, const FVector& location);
+	void CallBcastLocationSync(const FString& userId, const FVector& location);
 
 private:
 	void SetRecvCallback();

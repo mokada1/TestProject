@@ -1,10 +1,10 @@
 #include "TPClient.h"
-#include "../Util/TPError.h"
-#include "PacketGenerator.h"
-#include "../Util/TPUtil.h"
-#include "PacketService.h"
-#include "PacketProcessor.h"
-#include "Session.h"
+#include "../../Util/TPError.h"
+#include "../Packet/PacketGenerator.h"
+#include "../../Util/TPUtil.h"
+#include "../Packet/PacketService.h"
+#include "../Packet/PacketProcessor.h"
+#include "../Session/Session.h"
 
 #include <stdio.h>
 #include <stdlib.h>

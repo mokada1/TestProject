@@ -1,7 +1,7 @@
 #include "SocketRSThread.h"
-#include "../TP_generated.h"
-#include "../Util/TPError.h"
-#include "PacketProcessor.h"
+#include "../../TP_generated.h"
+#include "../../Util/TPError.h"
+#include "../Packet/PacketProcessor.h"
 
 USocketRSThread::~USocketRSThread()
 {
@@ -22,7 +22,10 @@ uint32 USocketRSThread::Run()
 {	
 	while (!isStopThread)
 	{
-		RecvPacket();
+		if (!RecvPacket())
+		{
+			break;
+		}
 	}
 	return 0;
 }
@@ -111,7 +114,7 @@ bool USocketRSThread::RecvPacket()
 	
 	if (recvBytes > 0)
 	{
-		PacketProcessor::GetInstance().PushToPacketList(wsaBuf.buf, static_cast<size_t>(recvBytes));
+		PacketProcessor::GetInstance().Parse(wsaBuf.buf, static_cast<size_t>(recvBytes));
 	}
 	return true;
 }

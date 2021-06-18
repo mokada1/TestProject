@@ -1,5 +1,5 @@
 #include "PacketProcessor.h"
-#include "TPClient.h"
+#include "../Core/TPClient.h"
 #include "PacketGenerator.h"
 #include "PacketService.h"
 
@@ -8,25 +8,27 @@ void PacketProcessor::SetClient(ATPClient* const _client)
 	client = _client;
 }
 
-void PacketProcessor::PushToPacketList(char* const buffer, const size_t bytesTransferred)
+void PacketProcessor::Parse(char* const buffer, const size_t bytesTransferred)
 {
 	const auto& packet = PacketGenerator::GetInstance().Parse(client->GetSession(), buffer, bytesTransferred);
 	if (!packet.IsValid())
 	{
 		return;
 	}
-
-	packetList.push(packet);
+	packetQueue.Enqueue(packet);
 }
 
 bool PacketProcessor::Process()
 {
-	if (packetList.empty())
+	if (packetQueue.IsEmpty())
 	{
 		return false;
 	}
-	PacketService::GetInstance().Process(packetList.front());
-	packetList.pop();
+	Packet packet;
+	if (packetQueue.Dequeue(packet))
+	{
+		PacketService::GetInstance().Process(packet);
+	}
 	return true;
 }
 

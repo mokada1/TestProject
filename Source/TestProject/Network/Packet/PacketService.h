@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../Util/TSingleton.h"
-#include "../Util/Delegate.h"
-#include "Struct/BcastMove.h"
+#include "../../Util/TSingleton.h"
+#include "../../Util/Delegate.h"
+#include "../Struct/BcastMove.h"
 
 class Packet;
 class UObjUser;
@@ -17,4 +17,5 @@ public:
 	Delegate<const UObjUser* const> recvCallBcastEnterGameRoom;
 	Delegate<const FString&> recvCallBcastExitGameRoom;
 	Delegate<const FBcastMove&> recvCallBcastMove;
+	Delegate<const FString&, const FVector&> recvCallBcastLocationSync;
 };

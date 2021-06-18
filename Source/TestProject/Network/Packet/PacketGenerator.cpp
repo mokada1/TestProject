@@ -1,7 +1,7 @@
 #include "PacketGenerator.h"
-#include "Session.h"
-#include "../TP_generated.h"
-#include "../Util/TPError.h"
+#include "../Session/Session.h"
+#include "../../TP_generated.h"
+#include "../../Util/TPError.h"
 
 #include <iostream>
 
@@ -92,8 +92,10 @@ Packet PacketGenerator::Parse(Session* const owner, char* const buffer, const si
 			else
 			{
 				// 패킷 완성
-				finishedBuffer = buffer;
+				finishedBuffer = new char[bytesTransferred];
+				memcpy(finishedBuffer, buffer, bytesTransferred);
 				finishedPacketSize = bytesTransferred;
+				isDAllocBuf = true;
 			}
 		}
 	}
@@ -136,6 +138,17 @@ Packet PacketGenerator::CreateReqMove(FBcastMove& moveLocation)
 	fbb.Finish(CreateTB_ReqMove(fbb, offsetUserId, offsetOperation, offsetInputMove));
 
 	return CreatePacket(PROTOCOL::REQ_MOVE, fbb);
+}
+
+Packet PacketGenerator::CreateReqMoveSync(const string& userId, const FVector& location)
+{
+	flatbuffers::FlatBufferBuilder fbb;
+
+	auto offsetUserId = fbb.CreateString(userId);
+	ST_Vec3 stLocation(location.X, location.Y, location.Z);
+	fbb.Finish(CreateTB_ReqLocationSync(fbb, offsetUserId, &stLocation));
+
+	return CreatePacket(PROTOCOL::REQ_LOCATION_SYNC, fbb);
 }
 
 Packet PacketGenerator::CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb)
@@ -197,8 +210,6 @@ bool PacketGenerator::IsValidHeader(const PROTOCOL protocol)
 	switch (protocol)
 	{
 	case PROTOCOL::TP_ERROR:
-	case PROTOCOL::REQ_LOGIN:
-	case PROTOCOL::REQ_MOVE:
 	case PROTOCOL::RES_LOGIN:
 	case PROTOCOL::BCAST_ENTER_GAME_ROOM:
 	case PROTOCOL::BCAST_EXIT_GAME_ROOM:

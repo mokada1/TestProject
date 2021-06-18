@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "TPClientService.h"
-#include "PacketProcessor.h"
-#include "PacketService.h"
-#include "PacketGenerator.h"
-#include "../Object/ObjUser.h"
-#include "../Core/TPCharacter.h"
+#include "../Packet/PacketProcessor.h"
+#include "../Packet/PacketService.h"
+#include "../Packet/PacketGenerator.h"
+#include "../../Object/ObjUser.h"
+#include "../../Core/TPCharacter.h"
 
 bool ATPClientService::ReqLogin(const FString& _userId, const FString& _password)
 {
@@ -29,7 +29,7 @@ bool ATPClientService::ReqLogin(const FString& _userId, const FString& _password
 	return result;
 }
 
-bool ATPClientService::ProcessReqMove(const EOpMove operation, const FInputMove& inputMove)
+bool ATPClientService::ReqMove(const EOpMove operation, const FInputMove& inputMove)
 {
 	if (!isLogined)
 	{
@@ -39,6 +39,19 @@ bool ATPClientService::ProcessReqMove(const EOpMove operation, const FInputMove&
 	FBcastMove bcastMove(propUserId, operation, inputMove);
 
 	auto packet = PacketGenerator::GetInstance().CreateReqMove(bcastMove);
+	auto result = PacketProcessor::GetInstance().SendPacket(packet);
+
+	return result;
+}
+
+bool ATPClientService::ReqMoveSync(const FVector& location)
+{
+	if (!isLogined)
+	{
+		return false;
+	}
+
+	auto packet = PacketGenerator::GetInstance().CreateReqMoveSync(hUserId, location);
 	auto result = PacketProcessor::GetInstance().SendPacket(packet);
 
 	return result;
@@ -68,6 +81,7 @@ void ATPClientService::SetRecvCallback()
 	PacketService::GetInstance().recvCallBcastEnterGameRoom += std::bind(&ATPClientService::CallBcastEnterGameRoom, this, std::placeholders::_1);
 	PacketService::GetInstance().recvCallBcastExitGameRoom += std::bind(&ATPClientService::CallBcastExitGameRoom, this, std::placeholders::_1);
 	PacketService::GetInstance().recvCallBcastMove += std::bind(&ATPClientService::CallBcastMove, this, std::placeholders::_1);
+	PacketService::GetInstance().recvCallBcastLocationSync += std::bind(&ATPClientService::CallBcastLocationSync, this, std::placeholders::_1, std::placeholders::_2);
 }
 
 void ATPClientService::ClearRecvCallback()
@@ -77,6 +91,7 @@ void ATPClientService::ClearRecvCallback()
 	PacketService::GetInstance().recvCallBcastEnterGameRoom.clear();
 	PacketService::GetInstance().recvCallBcastExitGameRoom.clear();
 	PacketService::GetInstance().recvCallBcastMove.clear();
+	PacketService::GetInstance().recvCallBcastLocationSync.clear();
 }
 
 void ATPClientService::CallError(const FString& message)
@@ -106,4 +121,9 @@ void ATPClientService::CallBcastExitGameRoom(const FString& userId)
 void ATPClientService::CallBcastMove(const FBcastMove& bcastMove)
 {
 	K2_RecvCallBcastMove(bcastMove);
+}
+
+void ATPClientService::CallBcastLocationSync(const FString& userId, const FVector& location)
+{
+	K2_RecvCallBcastLocationSync(userId, location);
 }

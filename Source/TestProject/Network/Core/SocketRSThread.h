@@ -6,7 +6,7 @@
 #include "UObject/Object.h"
 #include "HAL/Runnable.h"
 #include <WinSock2.h>
-#include "Packet.h"
+#include "../Packet/Packet.h"
 #include "SocketRSThread.generated.h"
 
 /**

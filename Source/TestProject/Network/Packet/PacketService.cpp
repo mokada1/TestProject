@@ -1,5 +1,5 @@
 ﻿#include "PacketService.h"
-#include "../Object/ObjUser.h"
+#include "../../Object/ObjUser.h"
 #include "Packet.h"
 
 void PacketService::Process(const Packet& packet)
@@ -27,8 +27,6 @@ void PacketService::Process(const Packet& packet)
 				wchar_t wUserId[SIZE_USER_USER_ID], wPassword[SIZE_USER_PASSWORD];
 				TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, it->UserId()->c_str());
 				TPUtil::GetInstance().MultiByteToWChar(wPassword, SIZE_USER_PASSWORD, it->Password()->c_str());
-				UE_LOG(LogTemp, Log, TEXT("UserId:%s Password:%s"), *FString(wUserId), *FString(wPassword));
-				UE_LOG(LogTemp, Log, TEXT("Location:%f,%f,%f"), it->UserLocation()->Location()->x(), it->UserLocation()->Location()->y(), it->UserLocation()->Location()->z());
 				auto newObjUser = UObjUser::Create(wUserId, wPassword);
 				auto newCompUserLocation = UCompUserLocation::Create(it->UserLocation()->Location()->x(), it->UserLocation()->Location()->y(), it->UserLocation()->Location()->z());
 				newObjUser->SetCompUserLocation(newCompUserLocation);
@@ -47,8 +45,6 @@ void PacketService::Process(const Packet& packet)
 			wchar_t wUserId[SIZE_USER_USER_ID], wPassword[SIZE_USER_PASSWORD];
 			TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, objUser->UserId()->c_str());
 			TPUtil::GetInstance().MultiByteToWChar(wPassword, SIZE_USER_PASSWORD, objUser->Password()->c_str());
-			UE_LOG(LogTemp, Log, TEXT("UserId:%s Password:%s"), *FString(wUserId), *FString(wPassword));
-			UE_LOG(LogTemp, Log, TEXT("Location:%f,%f,%f"), objUser->UserLocation()->Location()->x(), objUser->UserLocation()->Location()->y(), objUser->UserLocation()->Location()->z());
 			auto newObjUser = UObjUser::Create(wUserId, wPassword);
 			auto newCompUserLocation = UCompUserLocation::Create(objUser->UserLocation()->Location()->x(), objUser->UserLocation()->Location()->y(), objUser->UserLocation()->Location()->z());
 			newObjUser->SetCompUserLocation(newCompUserLocation);
@@ -62,11 +58,8 @@ void PacketService::Process(const Packet& packet)
 		auto objUser = req->ObjUser();
 		if (objUser)
 		{
-			wchar_t wUserId[SIZE_USER_USER_ID], wPassword[SIZE_USER_PASSWORD];
+			wchar_t wUserId[SIZE_USER_USER_ID];
 			TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, objUser->UserId()->c_str());
-			TPUtil::GetInstance().MultiByteToWChar(wPassword, SIZE_USER_PASSWORD, objUser->Password()->c_str());
-			UE_LOG(LogTemp, Log, TEXT("UserId:%s Password:%s"), *FString(wUserId), *FString(wPassword));
-			UE_LOG(LogTemp, Log, TEXT("Location:%f,%f,%f"), objUser->UserLocation()->Location()->x(), objUser->UserLocation()->Location()->y(), objUser->UserLocation()->Location()->z());
 			recvCallBcastExitGameRoom(FString(wUserId));
 		}
 		break;
@@ -87,6 +80,14 @@ void PacketService::Process(const Packet& packet)
 	{
 		auto req = flatbuffers::GetRoot<TB_BcastLocationSync>(packet.GetBody());
 		auto userId = req->UserId()->c_str();
+		auto location = req->Location();
+
+		wchar_t wUserId[SIZE_USER_USER_ID];
+		TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, userId);
+
+		FVector fLocation(location->x(), location->y(), location->z());
+
+		recvCallBcastLocationSync(FString(wUserId), fLocation);
 		break;
 	}
 	default:
