@@ -1,6 +1,16 @@
 #include "TPUtil.h"
 #include <stdio.h>
 #include <Windows.h>
+#include <chrono>
+#include <time.h>
+#include <ctime>
+
+using namespace std;
+
+using chrono::duration_cast;
+using chrono::milliseconds;
+using chrono::seconds;
+using chrono::system_clock;
 
 void TPUtil::CharToWChar(wchar_t* buffer, size_t bufferSize, const char* const source)
 {
@@ -30,4 +40,14 @@ void TPUtil::MultiByteToWChar(wchar_t* buffer, size_t bufferSize, const char* co
 	int len = MultiByteToWideChar(CP_ACP, 0, hBuffer, bufferSize, NULL, NULL);
 	MultiByteToWideChar(CP_ACP, 0, hBuffer, bufferSize, buffer, len);
 	delete[] hBuffer;
+}
+
+long long TPUtil::TimeSinceEpochMs()
+{
+	return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+}
+
+long long TPUtil::TimeSinceEpochSec()
+{
+	return duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
 }

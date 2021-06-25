@@ -26,7 +26,13 @@ public:
 	bool ReqMoveSync(const FVector& location);
 
 	UFUNCTION(BlueprintCallable, Category = Network)
+	bool ReqRoundTripTime();
+
+	UFUNCTION(BlueprintCallable, Category = Network)
 	bool GetIsLogined() const;
+
+	UFUNCTION(BlueprintCallable, Category = Network)
+	int64 GetRttMs() const;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = Network)
@@ -49,6 +55,8 @@ protected:
 	void K2_RecvCallResLogin(const TArray<UObjUser*>& objUserList);
 	void CallResLogin(const TArray<UObjUser*>& objUserList);
 
+	void CallResRoundTripTime(const int64 serverTimeMs, const int64 rttMsC2S);
+
 	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastEnterGameRoom", meta = (ScriptName = "RecvCallBcastEnterGameRoom"))
 	void K2_RecvCallBcastEnterGameRoom(const UObjUser* const objUser);
 	void CallBcastEnterGameRoom(const UObjUser* const objUser);
@@ -68,9 +76,14 @@ protected:
 private:
 	void SetRecvCallback();
 	void ClearRecvCallback();
+	void UpdateRtt(const int64_t serverTimeMs, const int64_t rttMsC2S);
 
 	bool isLogined;
 
 	char hUserId[SIZE_USER_USER_ID];
 	char hPassword[SIZE_USER_PASSWORD];
+
+	int64 totalRttMs;
+	int64 rttCount;
+	int64 avgRttMs;
 };

@@ -2,6 +2,7 @@
 #include "../Session/Session.h"
 #include "../../TP_generated.h"
 #include "../../Util/TPError.h"
+#include "../../Util/TPUtil.h"
 
 #include <iostream>
 
@@ -151,6 +152,17 @@ Packet PacketGenerator::CreateReqMoveSync(const string& userId, const FVector& l
 	return CreatePacket(PROTOCOL::REQ_LOCATION_SYNC, fbb);
 }
 
+Packet PacketGenerator::CreateReqRoundTripTime()
+{
+	flatbuffers::FlatBufferBuilder fbb;
+
+	auto currentTimeMs = static_cast<int64_t>(TPUtil::GetInstance().TimeSinceEpochMs());
+	UE_LOG(LogTemp, Log, TEXT("PacketGenerator::CreateReqRoundTripTime: currentTimeMs:%lld"), currentTimeMs);
+	fbb.Finish(CreateTB_ReqRoundTripTime(fbb, currentTimeMs));
+
+	return CreatePacket(PROTOCOL::REQ_ROUND_TRIP_TIME, fbb);
+}
+
 Packet PacketGenerator::CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb)
 {
 	auto bp = _fbb.GetBufferPointer();
@@ -211,6 +223,7 @@ bool PacketGenerator::IsValidHeader(const PROTOCOL protocol)
 	{
 	case PROTOCOL::TP_ERROR:
 	case PROTOCOL::RES_LOGIN:
+	case PROTOCOL::RES_ROUND_TRIP_TIME:
 	case PROTOCOL::BCAST_ENTER_GAME_ROOM:
 	case PROTOCOL::BCAST_EXIT_GAME_ROOM:
 	case PROTOCOL::BCAST_MOVE:

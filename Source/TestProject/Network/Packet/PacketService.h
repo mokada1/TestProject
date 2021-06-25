@@ -14,6 +14,7 @@ public:
 
 	Delegate<const FString&> recvCallError;
 	Delegate<const TArray<UObjUser*>&> recvCallResLogin;
+	Delegate<const int64, const int64> recvCallResRoundTripTime;
 	Delegate<const UObjUser* const> recvCallBcastEnterGameRoom;
 	Delegate<const FString&> recvCallBcastExitGameRoom;
 	Delegate<const FBcastMove&> recvCallBcastMove;

@@ -44,16 +44,24 @@ struct TB_ReqLocationSyncBuilder;
 struct TB_BcastLocationSync;
 struct TB_BcastLocationSyncBuilder;
 
+struct TB_ReqRoundTripTime;
+struct TB_ReqRoundTripTimeBuilder;
+
+struct TB_ResRoundTripTime;
+struct TB_ResRoundTripTimeBuilder;
+
 enum OpMove {
-  OpMove_Start = 0,
-  OpMove_Change = 1,
-  OpMove_End = 2,
-  OpMove_MIN = OpMove_Start,
+  OpMove_None = 0,
+  OpMove_Start = 1,
+  OpMove_Change = 2,
+  OpMove_End = 3,
+  OpMove_MIN = OpMove_None,
   OpMove_MAX = OpMove_End
 };
 
-inline const OpMove (&EnumValuesOpMove())[3] {
+inline const OpMove (&EnumValuesOpMove())[4] {
   static const OpMove values[] = {
+    OpMove_None,
     OpMove_Start,
     OpMove_Change,
     OpMove_End
@@ -62,7 +70,8 @@ inline const OpMove (&EnumValuesOpMove())[3] {
 }
 
 inline const char * const *EnumNamesOpMove() {
-  static const char * const names[4] = {
+  static const char * const names[5] = {
+    "None",
     "Start",
     "Change",
     "End",
@@ -72,7 +81,7 @@ inline const char * const *EnumNamesOpMove() {
 }
 
 inline const char *EnumNameOpMove(OpMove e) {
-  if (flatbuffers::IsOutRange(e, OpMove_Start, OpMove_End)) return "";
+  if (flatbuffers::IsOutRange(e, OpMove_None, OpMove_End)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesOpMove()[index];
 }
@@ -609,7 +618,7 @@ struct TB_ReqMoveBuilder {
 inline flatbuffers::Offset<TB_ReqMove> CreateTB_ReqMove(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> UserId = 0,
-    OpMove Operation = OpMove_Start,
+    OpMove Operation = OpMove_None,
     flatbuffers::Offset<TB_InputMove> InputMove = 0) {
   TB_ReqMoveBuilder builder_(_fbb);
   builder_.add_InputMove(InputMove);
@@ -621,7 +630,7 @@ inline flatbuffers::Offset<TB_ReqMove> CreateTB_ReqMove(
 inline flatbuffers::Offset<TB_ReqMove> CreateTB_ReqMoveDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *UserId = nullptr,
-    OpMove Operation = OpMove_Start,
+    OpMove Operation = OpMove_None,
     flatbuffers::Offset<TB_InputMove> InputMove = 0) {
   auto UserId__ = UserId ? _fbb.CreateString(UserId) : 0;
   return CreateTB_ReqMove(
@@ -686,7 +695,7 @@ struct TB_BcastMoveBuilder {
 inline flatbuffers::Offset<TB_BcastMove> CreateTB_BcastMove(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> UserId = 0,
-    OpMove Operation = OpMove_Start,
+    OpMove Operation = OpMove_None,
     flatbuffers::Offset<TB_InputMove> InputMove = 0) {
   TB_BcastMoveBuilder builder_(_fbb);
   builder_.add_InputMove(InputMove);
@@ -698,7 +707,7 @@ inline flatbuffers::Offset<TB_BcastMove> CreateTB_BcastMove(
 inline flatbuffers::Offset<TB_BcastMove> CreateTB_BcastMoveDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *UserId = nullptr,
-    OpMove Operation = OpMove_Start,
+    OpMove Operation = OpMove_None,
     flatbuffers::Offset<TB_InputMove> InputMove = 0) {
   auto UserId__ = UserId ? _fbb.CreateString(UserId) : 0;
   return CreateTB_BcastMove(
@@ -834,6 +843,100 @@ inline flatbuffers::Offset<TB_BcastLocationSync> CreateTB_BcastLocationSyncDirec
       _fbb,
       UserId__,
       Location);
+}
+
+struct TB_ReqRoundTripTime FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef TB_ReqRoundTripTimeBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_CURRENTTIMEMS = 4
+  };
+  int64_t CurrentTimeMs() const {
+    return GetField<int64_t>(VT_CURRENTTIMEMS, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int64_t>(verifier, VT_CURRENTTIMEMS) &&
+           verifier.EndTable();
+  }
+};
+
+struct TB_ReqRoundTripTimeBuilder {
+  typedef TB_ReqRoundTripTime Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_CurrentTimeMs(int64_t CurrentTimeMs) {
+    fbb_.AddElement<int64_t>(TB_ReqRoundTripTime::VT_CURRENTTIMEMS, CurrentTimeMs, 0);
+  }
+  explicit TB_ReqRoundTripTimeBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  TB_ReqRoundTripTimeBuilder &operator=(const TB_ReqRoundTripTimeBuilder &);
+  flatbuffers::Offset<TB_ReqRoundTripTime> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<TB_ReqRoundTripTime>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<TB_ReqRoundTripTime> CreateTB_ReqRoundTripTime(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int64_t CurrentTimeMs = 0) {
+  TB_ReqRoundTripTimeBuilder builder_(_fbb);
+  builder_.add_CurrentTimeMs(CurrentTimeMs);
+  return builder_.Finish();
+}
+
+struct TB_ResRoundTripTime FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef TB_ResRoundTripTimeBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_CURRENTTIMEMS = 4,
+    VT_ROUNDTRIPTIMEMS = 6
+  };
+  int64_t CurrentTimeMs() const {
+    return GetField<int64_t>(VT_CURRENTTIMEMS, 0);
+  }
+  int64_t RoundTripTimeMs() const {
+    return GetField<int64_t>(VT_ROUNDTRIPTIMEMS, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int64_t>(verifier, VT_CURRENTTIMEMS) &&
+           VerifyField<int64_t>(verifier, VT_ROUNDTRIPTIMEMS) &&
+           verifier.EndTable();
+  }
+};
+
+struct TB_ResRoundTripTimeBuilder {
+  typedef TB_ResRoundTripTime Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_CurrentTimeMs(int64_t CurrentTimeMs) {
+    fbb_.AddElement<int64_t>(TB_ResRoundTripTime::VT_CURRENTTIMEMS, CurrentTimeMs, 0);
+  }
+  void add_RoundTripTimeMs(int64_t RoundTripTimeMs) {
+    fbb_.AddElement<int64_t>(TB_ResRoundTripTime::VT_ROUNDTRIPTIMEMS, RoundTripTimeMs, 0);
+  }
+  explicit TB_ResRoundTripTimeBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  TB_ResRoundTripTimeBuilder &operator=(const TB_ResRoundTripTimeBuilder &);
+  flatbuffers::Offset<TB_ResRoundTripTime> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<TB_ResRoundTripTime>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<TB_ResRoundTripTime> CreateTB_ResRoundTripTime(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int64_t CurrentTimeMs = 0,
+    int64_t RoundTripTimeMs = 0) {
+  TB_ResRoundTripTimeBuilder builder_(_fbb);
+  builder_.add_RoundTripTimeMs(RoundTripTimeMs);
+  builder_.add_CurrentTimeMs(CurrentTimeMs);
+  return builder_.Finish();
 }
 
 #endif  // FLATBUFFERS_GENERATED_TP_H_

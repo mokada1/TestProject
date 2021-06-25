@@ -40,7 +40,8 @@ enum class EAlly : uint8
 UENUM(BlueprintType)
 enum class EOpMove : uint8
 {
+	None		UMETA(DisplayName = "None"),
 	Start		UMETA(DisplayName = "Start"),
 	Change		UMETA(DisplayName = "Change"),
-	End			UMETA(DisplayName = "End"),
+	End			UMETA(DisplayName = "End"),	
 };

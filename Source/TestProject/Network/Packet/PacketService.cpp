@@ -36,6 +36,15 @@ void PacketService::Process(const Packet& packet)
 		}	
 		break;
 	}
+	case PROTOCOL::RES_ROUND_TRIP_TIME:
+	{
+		auto req = flatbuffers::GetRoot<TB_ResRoundTripTime>(packet.GetBody());
+		auto currentTimeMs = req->CurrentTimeMs();
+		auto roundTripTimeMs = req->RoundTripTimeMs();
+		UE_LOG(LogTemp, Log, TEXT("currentTimeMs:%lld roundTripTimeMs:%lld"), currentTimeMs, roundTripTimeMs);
+		recvCallResRoundTripTime(currentTimeMs, roundTripTimeMs);
+		break;
+	}
 	case PROTOCOL::BCAST_ENTER_GAME_ROOM:
 	{
 		auto req = flatbuffers::GetRoot<TB_BcastEnterGameRoom>(packet.GetBody());

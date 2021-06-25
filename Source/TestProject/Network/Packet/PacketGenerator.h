@@ -18,6 +18,7 @@ public:
 	Packet CreateReqLogin(const string& userId, const string& password);
 	Packet CreateReqMove(FBcastMove& moveLocation);
 	Packet CreateReqMoveSync(const string& userId, const FVector& location);
+	Packet CreateReqRoundTripTime();
 	
 private:	
 	Packet CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb);
