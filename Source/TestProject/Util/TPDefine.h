@@ -15,3 +15,5 @@ typedef unsigned long DWORD;
 
 #define SIZE_USER_USER_ID 45
 #define SIZE_USER_PASSWORD 45
+
+#define MAX_RTT_MS 1000

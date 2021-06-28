@@ -7,7 +7,7 @@ USocketRSThread::~USocketRSThread()
 {
 	if (IsRunning())
 	{
-		thread->Kill(true);
+		delete thread;
 		thread = nullptr;
 	}
 }
@@ -20,13 +20,25 @@ bool USocketRSThread::Init()
 
 uint32 USocketRSThread::Run()
 {	
-	while (!isStopThread)
+	if (isRecvThread)
 	{
-		if (!RecvPacket())
+		while (!isStopThread)
 		{
-			break;
+			if (!RecvPacket())
+			{
+				break;
+			}
 		}
 	}
+	else
+	{
+		while (!isStopThread)
+		{
+			PacketProcessor::GetInstance().ProcSendPacket();
+			FPlatformProcess::Sleep(0.001f);
+		}
+	}
+
 	return 0;
 }
 
@@ -44,26 +56,24 @@ bool USocketRSThread::IsRunning()
 	return thread && !isStopThread;
 }
 
-void USocketRSThread::Start(SOCKET socket)
+void USocketRSThread::Start(SOCKET socket, bool _isRecvThread)
 {
 	this->hSocket = socket;
+	this->isRecvThread = _isRecvThread;
 	thread = FRunnableThread::Create(this, TEXT("USocketRSThread"));
 }
 
 bool USocketRSThread::SendPacket(const Packet& packet)
 {
-	WSAEVENT wevent = WSACreateEvent();
-	WSAOVERLAPPED overlapped;
-	memset(&overlapped, 0, sizeof(overlapped));
-	overlapped.hEvent = wevent;
-
-	WSABUF wsaBuf;
-	wsaBuf.len = static_cast<ULONG>(packet.GetPacketSize());
-	wsaBuf.buf = packet.GetBuffer();
+	PER_IO_DATA perIoData;
 	DWORD sendBytes = 0;
-	DWORD flags = 0;
 
-	if (WSASend(hSocket, &wsaBuf, 1, &sendBytes, 0, &overlapped, NULL) == SOCKET_ERROR)
+	memset(&(perIoData.overlapped), 0, sizeof(OVERLAPPED));
+	perIoData.wsaBuf.len = static_cast<ULONG>(packet.GetPacketSize());
+	perIoData.wsaBuf.buf = packet.GetBuffer();
+	perIoData.operation = OP_ClientToServer;
+
+	if (WSASend(hSocket, &(perIoData.wsaBuf), 1, &sendBytes, 0, &(perIoData.overlapped), NULL) == SOCKET_ERROR)
 	{
 		auto e = WSAGetLastError();
 		if (e != WSA_IO_PENDING)
@@ -73,30 +83,29 @@ bool USocketRSThread::SendPacket(const Packet& packet)
 		}
 	}
 
-	WSAWaitForMultipleEvents(1, &wevent, TRUE, WSA_INFINITE, FALSE);
+	//WSAWaitForMultipleEvents(1, &wevent, TRUE, WSA_INFINITE, FALSE);
 
-	WSAGetOverlappedResult(hSocket, &overlapped, &sendBytes, FALSE, &flags);
+	//WSAGetOverlappedResult(hSocket, &overlapped, &sendBytes, FALSE, &flags);
 
-	UE_LOG(LogTemp, Log, TEXT("Number of bytes transferred: %d"), sendBytes);
+	UE_LOG(LogTemp, Log, TEXT("Number of bytes transferred:%d"), sendBytes);
 	
 	return true;
 }
 
 bool USocketRSThread::RecvPacket()
-{
-	WSAEVENT wevent = WSACreateEvent();
-	WSAOVERLAPPED overlapped;
-	memset(&overlapped, 0, sizeof(overlapped));
-	overlapped.hEvent = wevent;
+{	
+	PER_IO_DATA perIoData;
+	DWORD recvBytes;
+	DWORD flags;
 
-	char buffer[MAX_BUFF_SIZE];
-	WSABUF wsaBuf;
-	wsaBuf.len = MAX_BUFF_SIZE;
-	wsaBuf.buf = buffer;
-	DWORD recvBytes = 0;
-	DWORD flags = 0;
+	memset(&(perIoData.overlapped), 0, sizeof(OVERLAPPED));
+	perIoData.overlapped.hEvent = WSACreateEvent();
+	perIoData.wsaBuf.len = MAX_BUFF_SIZE;
+	perIoData.wsaBuf.buf = perIoData.buffer;
+	perIoData.operation = OP_ServerToClient;
+	flags = 0;
 
-	if (WSARecv(hSocket, &wsaBuf, 1, &recvBytes, &flags, &overlapped, NULL) == SOCKET_ERROR)
+	if (WSARecv(hSocket, &(perIoData.wsaBuf), 1, NULL, &flags, &(perIoData.overlapped), NULL) == SOCKET_ERROR)
 	{
 		auto e = WSAGetLastError();
 		if (e != WSA_IO_PENDING)
@@ -106,15 +115,16 @@ bool USocketRSThread::RecvPacket()
 		}
 	}
 
-	WSAWaitForMultipleEvents(1, &wevent, TRUE, WSA_INFINITE, FALSE);
+	WSAWaitForMultipleEvents(1, &perIoData.overlapped.hEvent, TRUE, WSA_INFINITE, FALSE);
 
-	WSAGetOverlappedResult(hSocket, &overlapped, &recvBytes, FALSE, &flags);
+	WSAGetOverlappedResult(hSocket, &perIoData.overlapped, &recvBytes, FALSE, &flags);
 
 	UE_LOG(LogTemp, Log, TEXT("Number of bytes received: %d"), recvBytes);
 	
 	if (recvBytes > 0)
 	{
-		PacketProcessor::GetInstance().Parse(wsaBuf.buf, static_cast<size_t>(recvBytes));
+		PacketProcessor::GetInstance().Parse(perIoData.wsaBuf.buf, static_cast<size_t>(recvBytes));
 	}
+
 	return true;
 }

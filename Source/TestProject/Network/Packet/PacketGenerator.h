@@ -13,15 +13,15 @@ class Session;
 class PacketGenerator : public TSingleton<PacketGenerator>
 {
 public:
-	Packet Parse(Session* const owner, char* const buffer, const size_t bytesTransferred);
+	Packet* Parse(Session* const owner, char* const buffer, const size_t recvBytes);
 
-	Packet CreateReqLogin(const string& userId, const string& password);
-	Packet CreateReqMove(FBcastMove& moveLocation);
-	Packet CreateReqMoveSync(const string& userId, const FVector& location);
-	Packet CreateReqRoundTripTime();
+	Packet* CreateReqLogin(const string& userId, const string& password);
+	Packet* CreateReqMove(FBcastMove& moveLocation);
+	Packet* CreateReqMoveSync(const string& userId, const FVector& location);
+	Packet* CreateReqRoundTripTime();
 	
 private:	
-	Packet CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb);
+	Packet* CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb);
 	PROTOCOL GetHeaderByBuff(char* const buffer);
 	PROTOCOL GetEndOfPacket(char* const buffer, const size_t packetSize);
 	void SetHeaderOfBuff(char* const buffer, PROTOCOL header);

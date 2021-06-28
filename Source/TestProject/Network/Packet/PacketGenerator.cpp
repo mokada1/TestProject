@@ -8,11 +8,11 @@
 
 using namespace std;
 
-Packet PacketGenerator::Parse(Session* const owner, char* const buffer, const size_t bytesTransferred)
+Packet* PacketGenerator::Parse(Session* const owner, char* const buffer, const size_t recvBytes)
 {
-	if (bytesTransferred == 0)
+	if (recvBytes == 0)
 	{
-		return Packet();
+		return nullptr;
 	}
 
 	char* finishedBuffer = nullptr;
@@ -23,14 +23,14 @@ Packet PacketGenerator::Parse(Session* const owner, char* const buffer, const si
 	if (ownerBuff)
 	{
 		// 최대 버퍼 크기를 넘는 경우 패킷 처리 안함
-		if (owner->GetPacketSize() + bytesTransferred > MAX_BUFF_SIZE)
+		if (owner->GetPacketSize() + recvBytes > MAX_BUFF_SIZE)
 		{
 			TPError::GetInstance().PrintError(L"Error:Invalid PacketSize");
 			owner->ClearBuff();
-			return Packet();
+			return nullptr;
 		}
 
-		owner->AddToBuff(buffer, bytesTransferred);
+		owner->AddToBuff(buffer, recvBytes);
 		ownerBuff = owner->GetBuffer();
 		const auto ownerPacketSize = owner->GetPacketSize();
 
@@ -40,7 +40,7 @@ Packet PacketGenerator::Parse(Session* const owner, char* const buffer, const si
 		{
 			TPError::GetInstance().PrintError(L"Error:Invalid Header");
 			owner->ClearBuff();
-			return Packet();
+			return nullptr;
 		}
 
 		const auto endOfPacket = PacketGenerator::GetInstance().GetEndOfPacket(ownerBuff, ownerPacketSize);
@@ -51,7 +51,7 @@ Packet PacketGenerator::Parse(Session* const owner, char* const buffer, const si
 			{
 				TPError::GetInstance().PrintError(L"Error:Invalid EndOfPacket");
 				owner->ClearBuff();
-				return Packet();
+				return nullptr;
 			}
 		}
 		else
@@ -65,9 +65,9 @@ Packet PacketGenerator::Parse(Session* const owner, char* const buffer, const si
 	}
 	else
 	{
-		if (bytesTransferred < PACKET_HEAD_SIZE)
+		if (recvBytes < PACKET_HEAD_SIZE)
 		{
-			owner->AddToBuff(buffer, bytesTransferred);
+			owner->AddToBuff(buffer, recvBytes);
 		}
 		else
 		{
@@ -76,26 +76,26 @@ Packet PacketGenerator::Parse(Session* const owner, char* const buffer, const si
 			if (!IsValidHeader(header))
 			{
 				TPError::GetInstance().PrintError(L"Error:Invalid Header");
-				return Packet();
+				return nullptr;
 			}
 
-			const auto endOfPacket = PacketGenerator::GetInstance().GetEndOfPacket(buffer, bytesTransferred);
+			const auto endOfPacket = PacketGenerator::GetInstance().GetEndOfPacket(buffer, recvBytes);
 			if (!IsValidEndOfPacket(endOfPacket))
 			{
 				// 잘못된 EndOfPacket일 경우 패킷 처리 안함
-				if (bytesTransferred == MAX_BUFF_SIZE)
+				if (recvBytes == MAX_BUFF_SIZE)
 				{
 					TPError::GetInstance().PrintError(L"Error:Invalid EndOfPacket");
-					return Packet();
+					return nullptr;
 				}
-				owner->AddToBuff(buffer, bytesTransferred);
+				owner->AddToBuff(buffer, recvBytes);
 			}
 			else
 			{
 				// 패킷 완성
-				finishedBuffer = new char[bytesTransferred];
-				memcpy(finishedBuffer, buffer, bytesTransferred);
-				finishedPacketSize = bytesTransferred;
+				finishedBuffer = new char[recvBytes];
+				memcpy(finishedBuffer, buffer, recvBytes);
+				finishedPacketSize = recvBytes;
 				isDAllocBuf = true;
 			}
 		}
@@ -104,17 +104,17 @@ Packet PacketGenerator::Parse(Session* const owner, char* const buffer, const si
 	// 패킷이 완성되지 않았으면 빈 패킷 리턴
 	if (!finishedBuffer)
 	{
-		return Packet();
+		return nullptr;
 	}
 
 	// 완성된 패킷 리턴
 	PROTOCOL header = GetHeaderByBuff(finishedBuffer);
 	auto packetInfo = PacketInfo(finishedBuffer, finishedPacketSize, header);
 	auto packetSubInfo = PacketSubInfo(isDAllocBuf);
-	return Packet(packetInfo, packetSubInfo);
+	return new Packet(packetInfo, packetSubInfo);
 }
 
-Packet PacketGenerator::CreateReqLogin(const string& userId, const string& password)
+Packet* PacketGenerator::CreateReqLogin(const string& userId, const string& password)
 {
 	flatbuffers::FlatBufferBuilder fbb;
 
@@ -125,7 +125,7 @@ Packet PacketGenerator::CreateReqLogin(const string& userId, const string& passw
 	return CreatePacket(PROTOCOL::REQ_LOGIN, fbb);
 }
 
-Packet PacketGenerator::CreateReqMove(FBcastMove& moveLocation)
+Packet* PacketGenerator::CreateReqMove(FBcastMove& moveLocation)
 {
 	char hUserId[SIZE_USER_USER_ID];
 	TPUtil::GetInstance().WCharToMultiByte(hUserId, SIZE_USER_USER_ID, *(moveLocation.userId));
@@ -141,7 +141,7 @@ Packet PacketGenerator::CreateReqMove(FBcastMove& moveLocation)
 	return CreatePacket(PROTOCOL::REQ_MOVE, fbb);
 }
 
-Packet PacketGenerator::CreateReqMoveSync(const string& userId, const FVector& location)
+Packet* PacketGenerator::CreateReqMoveSync(const string& userId, const FVector& location)
 {
 	flatbuffers::FlatBufferBuilder fbb;
 
@@ -152,18 +152,17 @@ Packet PacketGenerator::CreateReqMoveSync(const string& userId, const FVector& l
 	return CreatePacket(PROTOCOL::REQ_LOCATION_SYNC, fbb);
 }
 
-Packet PacketGenerator::CreateReqRoundTripTime()
+Packet* PacketGenerator::CreateReqRoundTripTime()
 {
 	flatbuffers::FlatBufferBuilder fbb;
 
 	auto currentTimeMs = static_cast<int64_t>(TPUtil::GetInstance().TimeSinceEpochMs());
-	UE_LOG(LogTemp, Log, TEXT("PacketGenerator::CreateReqRoundTripTime: currentTimeMs:%lld"), currentTimeMs);
 	fbb.Finish(CreateTB_ReqRoundTripTime(fbb, currentTimeMs));
 
 	return CreatePacket(PROTOCOL::REQ_ROUND_TRIP_TIME, fbb);
 }
 
-Packet PacketGenerator::CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb)
+Packet* PacketGenerator::CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb)
 {
 	auto bp = _fbb.GetBufferPointer();
 	auto bSize = _fbb.GetSize();
@@ -180,7 +179,7 @@ Packet PacketGenerator::CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBui
 
 	auto packetInfo = PacketInfo(buffer, BUFF_DATA_SIZE, header);
 	auto packetSubInfo = PacketSubInfo(true);
-	return Packet(packetInfo, packetSubInfo);
+	return new Packet(packetInfo, packetSubInfo);
 }
 
 PROTOCOL PacketGenerator::GetHeaderByBuff(char* const buffer)

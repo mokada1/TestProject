@@ -35,12 +35,6 @@ public:
 	int64 GetRttMs() const;
 
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = Network)
-	FString propUserId;
-
-	UPROPERTY(BlueprintReadOnly, Category = Network)
-	FString propPassword;
-
 	UFUNCTION(BlueprintCallable, Category = TPClientService)
 	void CallBeginPlay();
 
@@ -72,6 +66,12 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastLocationSync", meta = (ScriptName = "RecvCallBcastLocationSync"))
 	void K2_RecvCallBcastLocationSync(const FString& userId, const FVector& location);
 	void CallBcastLocationSync(const FString& userId, const FVector& location);
+
+	UPROPERTY(BlueprintReadOnly, Category = Network)
+	FString propUserId;
+
+	UPROPERTY(BlueprintReadOnly, Category = Network)
+	FString propPassword;
 
 private:
 	void SetRecvCallback();

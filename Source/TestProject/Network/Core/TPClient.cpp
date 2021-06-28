@@ -71,8 +71,11 @@ bool ATPClient::Connect()
 
     session = new Session(hSocket, recvAddr);
 
-    rsThread = NewObject<USocketRSThread>();
-    rsThread->Start(hSocket);
+    recvThread = NewObject<USocketRSThread>();
+    recvThread->Start(hSocket, true);
+    sendThread = NewObject<USocketRSThread>();
+    sendThread->Start(hSocket, false);
+
     PacketProcessor::GetInstance().SetClient(this);
 
     UE_LOG(LogTemp, Log, TEXT("Client Connect Success"));
@@ -94,22 +97,28 @@ void ATPClient::CallEndPlay(const EEndPlayReason::Type endPlayReason)
 
 bool ATPClient::Close()
 {
+    PacketProcessor::GetInstance().Close();
 	if (hSocket)
 	{
-        if (rsThread && rsThread->IsRunning())
+        if (recvThread && recvThread->IsRunning())
         {
-            rsThread->Stop();
-            rsThread = nullptr;
+            recvThread->Stop();
+            recvThread = nullptr;
+        }
+        if (sendThread && sendThread->IsRunning())
+        {
+            sendThread->Stop();
+            sendThread = nullptr;
         }
         closesocket(hSocket);
 	}
-    WSACleanup();    
+    WSACleanup();   
     return true;
 }
 
-void ATPClient::ProcessPackets()
+void ATPClient::ProcRecvPackets()
 {
-    while (PacketProcessor::GetInstance().Process());
+    while (PacketProcessor::GetInstance().ProcRecvPacket());
 }
 
 bool ATPClient::GetIsConnected() const
@@ -119,11 +128,11 @@ bool ATPClient::GetIsConnected() const
 
 bool ATPClient::SendPacket(const Packet& packet)
 {
-    if (!rsThread || !rsThread->IsRunning())
+    if (!sendThread || !sendThread->IsRunning())
     {
         return false;
     }
-	return rsThread->SendPacket(packet);
+	return sendThread->SendPacket(packet);
 }
 
 Session* ATPClient::GetSession() const

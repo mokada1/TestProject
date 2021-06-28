@@ -41,7 +41,6 @@ void PacketService::Process(const Packet& packet)
 		auto req = flatbuffers::GetRoot<TB_ResRoundTripTime>(packet.GetBody());
 		auto currentTimeMs = req->CurrentTimeMs();
 		auto roundTripTimeMs = req->RoundTripTimeMs();
-		UE_LOG(LogTemp, Log, TEXT("currentTimeMs:%lld roundTripTimeMs:%lld"), currentTimeMs, roundTripTimeMs);
 		recvCallResRoundTripTime(currentTimeMs, roundTripTimeMs);
 		break;
 	}

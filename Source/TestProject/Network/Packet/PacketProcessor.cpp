@@ -8,35 +8,83 @@ void PacketProcessor::SetClient(ATPClient* const _client)
 	client = _client;
 }
 
-void PacketProcessor::Parse(char* const buffer, const size_t bytesTransferred)
+void PacketProcessor::Parse(char* const buffer, const size_t recvBytes)
 {
-	const auto& packet = PacketGenerator::GetInstance().Parse(client->GetSession(), buffer, bytesTransferred);
-	if (!packet.IsValid())
+	if (!client)
 	{
 		return;
 	}
-	packetQueue.Enqueue(packet);
+	auto packet = PacketGenerator::GetInstance().Parse(client->GetSession(), buffer, recvBytes);
+	if (!packet)
+	{
+		return;
+	}
+	if (!packet->IsValid())
+	{
+		delete packet;
+		return;
+	}
+	packetRecvQueue.Enqueue(packet);
 }
 
-bool PacketProcessor::Process()
-{
-	if (packetQueue.IsEmpty())
-	{
-		return false;
-	}
-	Packet packet;
-	if (packetQueue.Dequeue(packet))
-	{
-		PacketService::GetInstance().Process(packet);
-	}
-	return true;
-}
-
-bool PacketProcessor::SendPacket(const Packet& packet)
+bool PacketProcessor::SendPacket(Packet* const packet)
 {
 	if (!client)
 	{
 		return false;
 	}
-	return client->SendPacket(packet);
+	packetSendQueue.Enqueue(packet);
+	return true;
+}
+
+bool PacketProcessor::ProcRecvPacket()
+{
+	if (packetRecvQueue.IsEmpty())
+	{
+		return false;
+	}
+	Packet* packet = nullptr;
+	if (packetRecvQueue.Dequeue(packet))
+	{
+		PacketService::GetInstance().Process(*packet);
+		delete packet;
+		return true;
+	}
+	return false;
+}
+
+bool PacketProcessor::ProcSendPacket()
+{
+	if (!client || packetSendQueue.IsEmpty())
+	{
+		return false;
+	}
+	bool result = false;
+	Packet* packet = nullptr;
+	if (packetSendQueue.Dequeue(packet))
+	{
+		result = client->SendPacket(*packet);
+		delete packet;
+	}
+	return result;
+}
+
+void PacketProcessor::Close()
+{
+	while (!packetSendQueue.IsEmpty())
+	{
+		Packet* packet = nullptr;
+		if (packetSendQueue.Dequeue(packet))
+		{
+			delete packet;
+		}
+	}
+	while (!packetRecvQueue.IsEmpty())
+	{
+		Packet* packet = nullptr;
+		if (packetRecvQueue.Dequeue(packet))
+		{
+			delete packet;
+		}
+	}
 }

@@ -113,11 +113,17 @@ void ATPClientService::UpdateRtt(const int64 serverTimeMs, const int64 rttMsC2S)
 	const auto clientTimeMs = TPUtil::GetInstance().TimeSinceEpochMs();
 	const auto rttMsS2C = TPUTIL_MAX(clientTimeMs - serverTimeMs, 0);
 	const auto rttMs = rttMsC2S + rttMsS2C;
+	
+	// 왕복 시간이 너무 큰 값이면 무시(1초 기준)
+	if (rttMs > MAX_RTT_MS)
+	{
+		return;
+	}
+
 	totalRttMs += rttMs;
 	rttCount++;
 	avgRttMs = totalRttMs / rttCount;
-	UE_LOG(LogTemp, Log, TEXT("serverTimeMs:%lld rttMsC2S:%lld"), serverTimeMs, rttMsC2S);
-	UE_LOG(LogTemp, Log, TEXT("rttMsS2C:%lld rttMs:%lld avgRttMs:%lld"), rttMsS2C, rttMs, avgRttMs);
+	UE_LOG(LogTemp, Log, TEXT("rttMsC2S:%lld rttMsS2C:%lld avgRttMs:%lld"), rttMsC2S, rttMsS2C, avgRttMs);
 }
 
 void ATPClientService::CallError(const FString& message)

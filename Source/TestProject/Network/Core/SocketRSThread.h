@@ -25,16 +25,23 @@ public:
 	virtual void Stop() override;
 	virtual void Exit() override;
 
-	void Start(SOCKET socket);		
+	void Start(SOCKET socket, bool _isRecvThread);
 	bool SendPacket(const Packet& packet);
 
 	bool IsRunning();
 private:
 	bool RecvPacket();
 	
-	const int HEAD_SIZE = sizeof(PROTOCOL);
 	SOCKET hSocket;
-
 	bool isStopThread;
 	FRunnableThread* thread;
+	bool isRecvThread;
 };
+
+typedef struct
+{
+	OVERLAPPED overlapped;
+	char buffer[MAX_BUFF_SIZE];
+	WSABUF wsaBuf;
+	int operation;
+} PER_IO_DATA, * LPPER_IO_DATA;

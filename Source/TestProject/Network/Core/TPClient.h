@@ -17,7 +17,7 @@ public:
 	bool CreateClientAndConnect(const FString& _serverIp, const FString& _serverPort);
 
 	UFUNCTION(BlueprintCallable, Category = Network)
-	void ProcessPackets();
+	void ProcRecvPackets();
 
 	UFUNCTION(BlueprintCallable, Category = Network)
 	bool GetIsConnected() const;
@@ -45,5 +45,8 @@ private:
 	Session* session;
 
 	UPROPERTY()
-	USocketRSThread* rsThread;
+	USocketRSThread* recvThread;
+
+	UPROPERTY()
+	USocketRSThread* sendThread;
 };
