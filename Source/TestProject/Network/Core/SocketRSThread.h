@@ -2,13 +2,15 @@
 
 #pragma once
 
-#include "CoreTypes.h"
-#include "UObject/Object.h"
-#include "HAL/Runnable.h"
+#include "Runtime/Core/Public/Windows/AllowWindowsPlatformTypes.h"
 #include <WinSock2.h>
-#include "../Packet/Packet.h"
-#include "SocketRSThread.generated.h"
+#include "Runtime/Core/Public/Windows/HideWindowsPlatformTypes.h"
 
+#include "../Packet/Packet.h"
+
+#include "HAL/Runnable.h"
+#include "UObject/Object.h"
+#include "SocketRSThread.generated.h"
 /**
  * 
  */

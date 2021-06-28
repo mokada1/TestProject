@@ -1,7 +1,7 @@
 #pragma once
 
 typedef unsigned long ULONG;
-typedef unsigned long DWORD;
+//typedef unsigned long DWORD;
 
 #define PACKET_HEAD_SIZE 2
 #define PACKET_END_SIZE 2

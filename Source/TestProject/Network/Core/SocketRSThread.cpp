@@ -83,9 +83,9 @@ bool USocketRSThread::SendPacket(const Packet& packet)
 		}
 	}
 
-	//WSAWaitForMultipleEvents(1, &wevent, TRUE, WSA_INFINITE, FALSE);
+	//WSAWaitForMultipleEvents(1, &wevent, true, WSA_INFINITE, false);
 
-	//WSAGetOverlappedResult(hSocket, &overlapped, &sendBytes, FALSE, &flags);
+	//WSAGetOverlappedResult(hSocket, &overlapped, &sendBytes, false, &flags);
 
 	UE_LOG(LogTemp, Log, TEXT("Number of bytes transferred:%d"), sendBytes);
 	
@@ -115,9 +115,9 @@ bool USocketRSThread::RecvPacket()
 		}
 	}
 
-	WSAWaitForMultipleEvents(1, &perIoData.overlapped.hEvent, TRUE, WSA_INFINITE, FALSE);
+	WSAWaitForMultipleEvents(1, &perIoData.overlapped.hEvent, true, WSA_INFINITE, false);
 
-	WSAGetOverlappedResult(hSocket, &perIoData.overlapped, &recvBytes, FALSE, &flags);
+	WSAGetOverlappedResult(hSocket, &perIoData.overlapped, &recvBytes, false, &flags);
 
 	UE_LOG(LogTemp, Log, TEXT("Number of bytes received: %d"), recvBytes);
 	
