@@ -3,6 +3,7 @@
 #include "../../Util/TSingleton.h"
 #include "../../Util/Delegate.h"
 #include "../Struct/BcastMove.h"
+#include "../Struct/BcastInputAction.h"
 
 class Packet;
 class UObjUser;
@@ -19,4 +20,5 @@ public:
 	Delegate<const FString&> recvCallBcastExitGameRoom;
 	Delegate<const FBcastMove&> recvCallBcastMove;
 	Delegate<const FString&, const FVector&> recvCallBcastLocationSync;
+	Delegate<const FBcastInputAction&> recvCallBcastInputAction;
 };

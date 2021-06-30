@@ -35,7 +35,7 @@ uint32 USocketRSThread::Run()
 		while (!isStopThread)
 		{
 			PacketProcessor::GetInstance().ProcSendPacket();
-			FPlatformProcess::Sleep(0.001f);
+			FPlatformProcess::Sleep(0.01f);
 		}
 	}
 
@@ -67,13 +67,15 @@ bool USocketRSThread::SendPacket(const Packet& packet)
 {
 	PER_IO_DATA perIoData;
 	DWORD sendBytes = 0;
+	DWORD flags = 0;
 
 	memset(&(perIoData.overlapped), 0, sizeof(OVERLAPPED));
+	//perIoData.overlapped.hEvent = WSACreateEvent();
 	perIoData.wsaBuf.len = static_cast<ULONG>(packet.GetPacketSize());
 	perIoData.wsaBuf.buf = packet.GetBuffer();
 	perIoData.operation = OP_ClientToServer;
 
-	if (WSASend(hSocket, &(perIoData.wsaBuf), 1, &sendBytes, 0, &(perIoData.overlapped), NULL) == SOCKET_ERROR)
+	if (WSASend(hSocket, &(perIoData.wsaBuf), 1, &sendBytes, flags, &(perIoData.overlapped), NULL) == SOCKET_ERROR)
 	{
 		auto e = WSAGetLastError();
 		if (e != WSA_IO_PENDING)
@@ -83,9 +85,9 @@ bool USocketRSThread::SendPacket(const Packet& packet)
 		}
 	}
 
-	//WSAWaitForMultipleEvents(1, &wevent, true, WSA_INFINITE, false);
+	//WSAWaitForMultipleEvents(1, &perIoData.overlapped.hEvent, true, WSA_INFINITE, false);
 
-	//WSAGetOverlappedResult(hSocket, &overlapped, &sendBytes, false, &flags);
+	//WSAGetOverlappedResult(hSocket, &perIoData.overlapped, &sendBytes, false, &flags);
 
 	UE_LOG(LogTemp, Log, TEXT("Number of bytes transferred:%d"), sendBytes);
 	
@@ -95,17 +97,16 @@ bool USocketRSThread::SendPacket(const Packet& packet)
 bool USocketRSThread::RecvPacket()
 {	
 	PER_IO_DATA perIoData;
-	DWORD recvBytes;
-	DWORD flags;
+	DWORD recvBytes = 0;
+	DWORD flags = 0;
 
 	memset(&(perIoData.overlapped), 0, sizeof(OVERLAPPED));
 	perIoData.overlapped.hEvent = WSACreateEvent();
 	perIoData.wsaBuf.len = MAX_BUFF_SIZE;
 	perIoData.wsaBuf.buf = perIoData.buffer;
 	perIoData.operation = OP_ServerToClient;
-	flags = 0;
 
-	if (WSARecv(hSocket, &(perIoData.wsaBuf), 1, NULL, &flags, &(perIoData.overlapped), NULL) == SOCKET_ERROR)
+	if (WSARecv(hSocket, &(perIoData.wsaBuf), 1, &recvBytes, &flags, &(perIoData.overlapped), NULL) == SOCKET_ERROR)
 	{
 		auto e = WSAGetLastError();
 		if (e != WSA_IO_PENDING)

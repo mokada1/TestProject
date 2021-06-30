@@ -5,6 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "../../Util/TPDefine.h"
 #include "../Struct/BcastMove.h"
+#include "../Struct/BcastInputAction.h"
 #include "TPClientService.generated.h"
 
 class UObjUser;
@@ -27,6 +28,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Network)
 	bool ReqRoundTripTime();
+
+	UFUNCTION(BlueprintCallable, Category = Network)
+	bool ReqInputAction(const EOpAction operation);
 
 	UFUNCTION(BlueprintCallable, Category = Network)
 	bool GetIsLogined() const;
@@ -67,6 +71,10 @@ protected:
 	void K2_RecvCallBcastLocationSync(const FString& userId, const FVector& location);
 	void CallBcastLocationSync(const FString& userId, const FVector& location);
 
+	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastInputAction", meta = (ScriptName = "RecvCallBcastInputAction"))
+	void K2_RecvCallBcastInputAction(const FBcastInputAction& bcastInputAction);
+	void CallBcastInputAction(const FBcastInputAction& bcastInputAction);
+
 	UPROPERTY(BlueprintReadOnly, Category = Network)
 	FString propUserId;
 
@@ -80,8 +88,8 @@ private:
 
 	bool isLogined;
 
-	char hUserId[SIZE_USER_USER_ID];
-	char hPassword[SIZE_USER_PASSWORD];
+	char cUserId[SIZE_USER_USER_ID];
+	char cPassword[SIZE_USER_PASSWORD];
 
 	int64 totalRttMs;
 	int64 rttCount;

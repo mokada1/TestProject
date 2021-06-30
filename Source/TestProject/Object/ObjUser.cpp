@@ -24,11 +24,11 @@ bool UObjUser::IsValid() const
 
 flatbuffers::Offset<TB_ObjUser> UObjUser::SerializeFB(flatbuffers::FlatBufferBuilder& _fbb) const
 {
-	char hUserId[SIZE_USER_USER_ID], hPassword[SIZE_USER_PASSWORD];
-	TPUtil::GetInstance().WCharToChar(hUserId, SIZE_USER_USER_ID, userId);
-	TPUtil::GetInstance().WCharToChar(hPassword, SIZE_USER_PASSWORD, password);
-	auto offsetUserId = _fbb.CreateString(hUserId);
-	auto offsetPassword = _fbb.CreateString(hPassword);
+	char cUserId[SIZE_USER_USER_ID], cPassword[SIZE_USER_PASSWORD];
+	TPUtil::GetInstance().WCharToChar(cUserId, SIZE_USER_USER_ID, userId);
+	TPUtil::GetInstance().WCharToChar(cPassword, SIZE_USER_PASSWORD, password);
+	auto offsetUserId = _fbb.CreateString(cUserId);
+	auto offsetPassword = _fbb.CreateString(cPassword);
 	auto offsetUserLocation = userLocation ? userLocation->SerializeFB(_fbb) : 0;
 
 	TB_ObjUserBuilder builder(_fbb);

@@ -125,18 +125,14 @@ Packet* PacketGenerator::CreateReqLogin(const string& userId, const string& pass
 	return CreatePacket(PROTOCOL::REQ_LOGIN, fbb);
 }
 
-Packet* PacketGenerator::CreateReqMove(FBcastMove& moveLocation)
+Packet* PacketGenerator::CreateReqMove(FBcastMove& bcastMove)
 {
-	char hUserId[SIZE_USER_USER_ID];
-	TPUtil::GetInstance().WCharToMultiByte(hUserId, SIZE_USER_USER_ID, *(moveLocation.userId));
-
 	flatbuffers::FlatBufferBuilder fbb;
 
-	auto offsetUserId = fbb.CreateString(hUserId);
-	auto offsetOperation = moveLocation.GetOffsetOperation();
-	auto offsetInputMove = moveLocation.inputMove.Serialize(fbb);
+	auto offsetOperation = bcastMove.GetOffsetOperation();
+	auto offsetInputMove = bcastMove.inputMove.Serialize(fbb);
 
-	fbb.Finish(CreateTB_ReqMove(fbb, offsetUserId, offsetOperation, offsetInputMove));
+	fbb.Finish(CreateTB_ReqMove(fbb, offsetOperation, offsetInputMove));
 
 	return CreatePacket(PROTOCOL::REQ_MOVE, fbb);
 }
@@ -145,9 +141,8 @@ Packet* PacketGenerator::CreateReqMoveSync(const string& userId, const FVector& 
 {
 	flatbuffers::FlatBufferBuilder fbb;
 
-	auto offsetUserId = fbb.CreateString(userId);
 	ST_Vec3 stLocation(location.X, location.Y, location.Z);
-	fbb.Finish(CreateTB_ReqLocationSync(fbb, offsetUserId, &stLocation));
+	fbb.Finish(CreateTB_ReqLocationSync(fbb, &stLocation));
 
 	return CreatePacket(PROTOCOL::REQ_LOCATION_SYNC, fbb);
 }
@@ -160,6 +155,17 @@ Packet* PacketGenerator::CreateReqRoundTripTime()
 	fbb.Finish(CreateTB_ReqRoundTripTime(fbb, currentTimeMs));
 
 	return CreatePacket(PROTOCOL::REQ_ROUND_TRIP_TIME, fbb);
+}
+
+Packet* PacketGenerator::CreateReqInputAction(FBcastInputAction& bcastInputAction)
+{
+	flatbuffers::FlatBufferBuilder fbb;
+
+	auto offsetOperation = bcastInputAction.GetOffsetOperation();
+
+	fbb.Finish(CreateTB_ReqInputAction(fbb, offsetOperation));
+
+	return CreatePacket(PROTOCOL::REQ_INPUT_ACTION, fbb);
 }
 
 Packet* PacketGenerator::CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb)
@@ -227,6 +233,7 @@ bool PacketGenerator::IsValidHeader(const PROTOCOL protocol)
 	case PROTOCOL::BCAST_EXIT_GAME_ROOM:
 	case PROTOCOL::BCAST_MOVE:
 	case PROTOCOL::BCAST_LOCATION_SYNC:
+	case PROTOCOL::BCAST_INPUT_ACTION:
 		return true;
 	}
 	return false;

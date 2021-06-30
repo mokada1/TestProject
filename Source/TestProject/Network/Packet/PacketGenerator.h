@@ -4,6 +4,7 @@
 #include "Packet.h"
 #include "../../TP_generated.h"
 #include "../Struct/BcastMove.h"
+#include "../Struct/BcastInputAction.h"
 #include <string>
 
 using namespace std;
@@ -16,9 +17,10 @@ public:
 	Packet* Parse(Session* const owner, char* const buffer, const size_t recvBytes);
 
 	Packet* CreateReqLogin(const string& userId, const string& password);
-	Packet* CreateReqMove(FBcastMove& moveLocation);
+	Packet* CreateReqMove(FBcastMove& bcastMove);
 	Packet* CreateReqMoveSync(const string& userId, const FVector& location);
 	Packet* CreateReqRoundTripTime();
+	Packet* CreateReqInputAction(FBcastInputAction& bcastInputAction);
 	
 private:	
 	Packet* CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb);

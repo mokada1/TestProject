@@ -21,7 +21,13 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	float moveRight;
 
-	FInputMove() {}
+	FInputMove()
+	{
+		forwardVector = FVector(0.f, 0.f, 0.f);
+		rightVector = FVector(0.f, 0.f, 0.f);
+		moveForward = 0.f;
+		moveRight = 0.f;
+	}
 	FInputMove(const TB_InputMove& inputMove)
 	{
 		forwardVector = FVector(inputMove.ForwardVector()->x(),

@@ -1,5 +1,9 @@
 #include "Session.h"
+
+#include "Runtime/Core/Public/Windows/AllowWindowsPlatformTypes.h"
 #include <WS2tcpip.h>
+#include "Runtime/Core/Public/Windows/HideWindowsPlatformTypes.h"
+
 #include "../../Util/TPDefine.h"
 
 Session::Session()

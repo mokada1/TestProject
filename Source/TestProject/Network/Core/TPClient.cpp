@@ -6,9 +6,11 @@
 #include "../Packet/PacketProcessor.h"
 #include "../Session/Session.h"
 
+#include "Runtime/Core/Public/Windows/AllowWindowsPlatformTypes.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <WS2tcpip.h>
+#include "Runtime/Core/Public/Windows/HideWindowsPlatformTypes.h"
 
 bool ATPClient::CreateClientAndConnect(const FString& _serverIp, const FString& _serverPort)
 {

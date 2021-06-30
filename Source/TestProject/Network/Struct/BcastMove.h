@@ -21,7 +21,12 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FInputMove inputMove;
 
-	FBcastMove() {}
+	FBcastMove()
+	{
+		userId = nullptr;
+		operation = EOpMove::None;
+		inputMove = FInputMove();
+	}
 	FBcastMove(const FString& _userId, const EOpMove& _operation, const FInputMove& _inputMove)
 	{
 		userId = _userId;
@@ -30,10 +35,10 @@ public:
 	}
 	FBcastMove(const TB_BcastMove& bcastMove)
 	{
-		auto mlUserId = bcastMove.UserId()->c_str();
+		auto cUserId = bcastMove.UserId()->c_str();
 
 		wchar_t wUserId[SIZE_USER_USER_ID];
-		TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, mlUserId);
+		TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, cUserId);
 
 		userId = FString(wUserId);
 		operation = static_cast<EOpMove>(bcastMove.Operation());
@@ -42,10 +47,10 @@ public:
 
 	flatbuffers::Offset<TB_BcastMove> Serialize(flatbuffers::FlatBufferBuilder& _fbb)
 	{
-		char hUserId[SIZE_USER_USER_ID];
-		TPUtil::GetInstance().WCharToMultiByte(hUserId, SIZE_USER_USER_ID, *userId);
+		char cUserId[SIZE_USER_USER_ID];
+		TPUtil::GetInstance().WCharToMultiByte(cUserId, SIZE_USER_USER_ID, *userId);
 
-		auto offsetUserId = _fbb.CreateString(hUserId);
+		auto offsetUserId = _fbb.CreateString(cUserId);
 		auto offsetOperation = GetOffsetOperation();
 		auto offsetInputMove = inputMove.Serialize(_fbb);
 

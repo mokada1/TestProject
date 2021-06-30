@@ -1,6 +1,8 @@
 #pragma once
 
+#include "Runtime/Core/Public/Windows/AllowWindowsPlatformTypes.h"
 #include <WinSock2.h>
+#include "Runtime/Core/Public/Windows/HideWindowsPlatformTypes.h"
 
 class Session
 {
