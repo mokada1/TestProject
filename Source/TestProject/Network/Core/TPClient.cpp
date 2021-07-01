@@ -1,5 +1,5 @@
 #include "TPClient.h"
-#include "../../Util/TPError.h"
+#include "../../Util/TPLogger.h"
 #include "../Packet/PacketGenerator.h"
 #include "../../Util/TPUtil.h"
 #include "../Packet/PacketService.h"
@@ -39,14 +39,14 @@ bool ATPClient::Initialize(const FString& _serverIp, const FString& _serverPort)
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
     {
-        TPError::GetInstance().PrintError(L"WSAStartup() Error!");
+        TPLogger::GetInstance().PrintLog("WSAStartup() Error!");
         return false;
     }
 
     hSocket = WSASocket(PF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
     if (hSocket == INVALID_SOCKET)
     {
-        TPError::GetInstance().PrintError(L"Socket() Error");
+        TPLogger::GetInstance().PrintLog("Socket() Error");
         return false;
     }
     
@@ -67,7 +67,7 @@ bool ATPClient::Connect()
 {
     if (connect(hSocket, (SOCKADDR*)&recvAddr, sizeof(recvAddr)) == SOCKET_ERROR)
     {
-        TPError::GetInstance().PrintError(L"Connect() Error!");
+        TPLogger::GetInstance().PrintLog("Connect() Error!");
         return false;
     }
 
@@ -80,7 +80,7 @@ bool ATPClient::Connect()
 
     PacketProcessor::GetInstance().SetClient(this);
 
-    UE_LOG(LogTemp, Log, TEXT("Client Connect Success"));
+    TPLogger::GetInstance().PrintLog("Connect success");
 
     return true;
 }

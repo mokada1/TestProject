@@ -1,6 +1,6 @@
 #include "SocketRSThread.h"
 #include "../../TP_generated.h"
-#include "../../Util/TPError.h"
+#include "../../Util/TPLogger.h"
 #include "../Packet/PacketProcessor.h"
 
 USocketRSThread::~USocketRSThread()
@@ -80,7 +80,7 @@ bool USocketRSThread::SendPacket(const Packet& packet)
 		auto e = WSAGetLastError();
 		if (e != WSA_IO_PENDING)
 		{
-			TPError::GetInstance().PrintError(L"WSASend() error", e);
+			TPLogger::GetInstance().PrintLog("WSASend() Error:%d", e);
 			return false;
 		}
 	}
@@ -89,8 +89,8 @@ bool USocketRSThread::SendPacket(const Packet& packet)
 
 	//WSAGetOverlappedResult(hSocket, &perIoData.overlapped, &sendBytes, false, &flags);
 
-	UE_LOG(LogTemp, Log, TEXT("Number of bytes transferred:%d"), sendBytes);
-	
+	TPLogger::GetInstance().PrintLog("Number of bytes transferred:%d", sendBytes);
+		
 	return true;
 }
 
@@ -111,7 +111,7 @@ bool USocketRSThread::RecvPacket()
 		auto e = WSAGetLastError();
 		if (e != WSA_IO_PENDING)
 		{
-			TPError::GetInstance().PrintError(L"WSARecv() error", e);
+			TPLogger::GetInstance().PrintLog("WSARecv() error:%d", e);
 			return false;
 		}
 	}
@@ -120,8 +120,8 @@ bool USocketRSThread::RecvPacket()
 
 	WSAGetOverlappedResult(hSocket, &perIoData.overlapped, &recvBytes, false, &flags);
 
-	UE_LOG(LogTemp, Log, TEXT("Number of bytes received: %d"), recvBytes);
-	
+	TPLogger::GetInstance().PrintLog("Number of bytes received:%d", recvBytes);
+		
 	if (recvBytes > 0)
 	{
 		PacketProcessor::GetInstance().Parse(perIoData.wsaBuf.buf, static_cast<size_t>(recvBytes));

@@ -1,7 +1,7 @@
 #include "PacketGenerator.h"
 #include "../Session/Session.h"
 #include "../../TP_generated.h"
-#include "../../Util/TPError.h"
+#include "../../Util/TPLogger.h"
 #include "../../Util/TPUtil.h"
 
 #include <iostream>
@@ -25,7 +25,7 @@ Packet* PacketGenerator::Parse(Session* const owner, char* const buffer, const s
 		// 최대 버퍼 크기를 넘는 경우 패킷 처리 안함
 		if (owner->GetPacketSize() + recvBytes > MAX_BUFF_SIZE)
 		{
-			TPError::GetInstance().PrintError(L"Error:Invalid PacketSize");
+			TPLogger::GetInstance().PrintLog("Error:Invalid PacketSize");
 			owner->ClearBuff();
 			return nullptr;
 		}
@@ -38,7 +38,7 @@ Packet* PacketGenerator::Parse(Session* const owner, char* const buffer, const s
 		// 잘못된 Header일 경우 패킷 처리 안함
 		if (!IsValidHeader(header))
 		{
-			TPError::GetInstance().PrintError(L"Error:Invalid Header");
+			TPLogger::GetInstance().PrintLog("Error:Invalid Header");
 			owner->ClearBuff();
 			return nullptr;
 		}
@@ -49,7 +49,7 @@ Packet* PacketGenerator::Parse(Session* const owner, char* const buffer, const s
 			// 잘못된 EndOfPacket일 경우 패킷 처리 안함
 			if (ownerPacketSize == MAX_BUFF_SIZE)
 			{
-				TPError::GetInstance().PrintError(L"Error:Invalid EndOfPacket");
+				TPLogger::GetInstance().PrintLog("Error:Invalid EndOfPacket");
 				owner->ClearBuff();
 				return nullptr;
 			}
@@ -75,7 +75,7 @@ Packet* PacketGenerator::Parse(Session* const owner, char* const buffer, const s
 			// 잘못된 Header일 경우 패킷 처리 안함
 			if (!IsValidHeader(header))
 			{
-				TPError::GetInstance().PrintError(L"Error:Invalid Header");
+				TPLogger::GetInstance().PrintLog("Error:Invalid Header");
 				return nullptr;
 			}
 
@@ -85,7 +85,7 @@ Packet* PacketGenerator::Parse(Session* const owner, char* const buffer, const s
 				// 잘못된 EndOfPacket일 경우 패킷 처리 안함
 				if (recvBytes == MAX_BUFF_SIZE)
 				{
-					TPError::GetInstance().PrintError(L"Error:Invalid EndOfPacket");
+					TPLogger::GetInstance().PrintLog("Error:Invalid EndOfPacket");
 					return nullptr;
 				}
 				owner->AddToBuff(buffer, recvBytes);
