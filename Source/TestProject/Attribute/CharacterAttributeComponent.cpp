@@ -16,13 +16,14 @@ bool UCharacterAttributeComponent::isAlive()
 
 void UCharacterAttributeComponent::Hit(const AActor* attacker)
 {
-	auto attackerComp = attacker->GetComponentByClass(UCharacterAttributeComponent::StaticClass());
-	auto attackerAttributeComp = Cast<UCharacterAttributeComponent>(attackerComp);
+	//auto attackerComp = attacker->GetComponentByClass(UCharacterAttributeComponent::StaticClass());
+	//auto attackerAttributeComp = Cast<UCharacterAttributeComponent>(attackerComp);
 
 	// 공격 피해량 적용
-	auto attackerStr = attackerAttributeComp->attributes.Find(ECharacterAttribute::Str);
+	//auto attackerStr = attackerAttributeComp->attributes.Find(ECharacterAttribute::Str);
 	auto targetHp = this->attributes.Find(ECharacterAttribute::Hp);
-	*targetHp = FMath::Clamp((*targetHp - *attackerStr), 0.f, *targetHp);
+	//*targetHp = FMath::Clamp((*targetHp - *attackerStr), 0.f, *targetHp);
+	*targetHp = FMath::Clamp((*targetHp - 10.f), 0.f, *targetHp);
 
 	UE_LOG(LogTemp, Log, TEXT("targetHp : %f"), *targetHp);
 }

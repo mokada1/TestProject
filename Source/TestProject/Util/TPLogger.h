@@ -13,7 +13,7 @@ public:
 	template<typename ... Args>
 	void PrintLog(const char* const format, Args ... args)
 	{
-		const size_t bufferSize = _snprintf(nullptr, 0, format, args ...) + 1ULL;
+		const auto bufferSize = snprintf(nullptr, 0, format, args ...) + 1ULL;
 		auto buffer = new char[bufferSize];
 		sprintf_s(buffer, bufferSize, format, args ...);
 		UE_LOG(LogTemp, Log, TEXT("%S"), buffer);
@@ -23,7 +23,7 @@ public:
 	template<typename ... Args>
 	void PrintLog(const wchar_t* const format, Args ... args)
 	{
-		const size_t bufferSize = _snwprintf(nullptr, 0, format, args ...) + 1ULL;
+		const auto bufferSize = snwprintf(nullptr, 0, format, args ...) + 1ULL;
 		auto buffer = new wchar_t[bufferSize];
 		swprintf_s(buffer, bufferSize, format, args ...);
 		UE_LOG(LogTemp, Log, TEXT("%S"), buffer);

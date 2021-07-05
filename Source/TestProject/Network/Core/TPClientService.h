@@ -5,7 +5,8 @@
 #include "GameFramework/Actor.h"
 #include "../../Util/TPDefine.h"
 #include "../Struct/BcastMove.h"
-#include "../Struct/BcastInputAction.h"
+#include "../Struct/BcastAction.h"
+#include "../Struct/BcastRotate.h"
 #include "TPClientService.generated.h"
 
 class UObjUser;
@@ -30,7 +31,13 @@ public:
 	bool ReqRoundTripTime();
 
 	UFUNCTION(BlueprintCallable, Category = Network)
-	bool ReqInputAction(const EOpAction operation);
+	bool ReqAction(const EOpAction operation, const FInputAction& inputAction);
+
+	UFUNCTION(BlueprintCallable, Category = Network)
+	bool ReqDamage();
+
+	UFUNCTION(BlueprintCallable, Category = Network)
+	bool ReqRotate(const FVector& rotation);
 
 	UFUNCTION(BlueprintCallable, Category = Network)
 	bool GetIsLogined() const;
@@ -71,9 +78,17 @@ protected:
 	void K2_RecvCallBcastLocationSync(const FString& userId, const FVector& location);
 	void CallBcastLocationSync(const FString& userId, const FVector& location);
 
-	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastInputAction", meta = (ScriptName = "RecvCallBcastInputAction"))
-	void K2_RecvCallBcastInputAction(const FBcastInputAction& bcastInputAction);
-	void CallBcastInputAction(const FBcastInputAction& bcastInputAction);
+	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastAction", meta = (ScriptName = "RecvCallBcastAction"))
+	void K2_RecvCallBcastAction(const FBcastAction& bcastAction);
+	void CallBcastAction(const FBcastAction& bcastAction);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastHit", meta = (ScriptName = "RecvCallBcastHit"))
+	void K2_RecvCallBcastHit(const FString& userId);
+	void CallBcastHit(const FString& userId);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastRotate", meta = (ScriptName = "RecvCallBcastRotate"))
+	void K2_RecvCallBcastRotate(const FBcastRotate& bcastRotate);
+	void CallBcastRotate(const FBcastRotate& bcastRotate);
 
 	UPROPERTY(BlueprintReadOnly, Category = Network)
 	FString propUserId;

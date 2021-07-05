@@ -120,6 +120,7 @@ Packet* PacketGenerator::CreateReqLogin(const string& userId, const string& pass
 
 	auto offsetUserId = fbb.CreateString(userId);
 	auto offsetPassword = fbb.CreateString(password);
+
 	fbb.Finish(CreateTB_ReqLogin(fbb, offsetUserId, offsetPassword));
 
 	return CreatePacket(PROTOCOL::REQ_LOGIN, fbb);
@@ -137,11 +138,12 @@ Packet* PacketGenerator::CreateReqMove(FBcastMove& bcastMove)
 	return CreatePacket(PROTOCOL::REQ_MOVE, fbb);
 }
 
-Packet* PacketGenerator::CreateReqMoveSync(const string& userId, const FVector& location)
+Packet* PacketGenerator::CreateReqMoveSync(const FVector& location)
 {
 	flatbuffers::FlatBufferBuilder fbb;
 
 	ST_Vec3 stLocation(location.X, location.Y, location.Z);
+
 	fbb.Finish(CreateTB_ReqLocationSync(fbb, &stLocation));
 
 	return CreatePacket(PROTOCOL::REQ_LOCATION_SYNC, fbb);
@@ -152,20 +154,42 @@ Packet* PacketGenerator::CreateReqRoundTripTime()
 	flatbuffers::FlatBufferBuilder fbb;
 
 	auto currentTimeMs = static_cast<int64_t>(TPUtil::GetInstance().TimeSinceEpochMs());
+
 	fbb.Finish(CreateTB_ReqRoundTripTime(fbb, currentTimeMs));
 
 	return CreatePacket(PROTOCOL::REQ_ROUND_TRIP_TIME, fbb);
 }
 
-Packet* PacketGenerator::CreateReqInputAction(FBcastInputAction& bcastInputAction)
+Packet* PacketGenerator::CreateReqAction(FBcastAction& bcastAction)
 {
 	flatbuffers::FlatBufferBuilder fbb;
 
-	auto offsetOperation = bcastInputAction.GetOffsetOperation();
+	auto offsetOperation = bcastAction.GetOffsetOperation();
+	auto offsetInputAction = bcastAction.inputAction.Serialize(fbb);
 
-	fbb.Finish(CreateTB_ReqInputAction(fbb, offsetOperation));
+	fbb.Finish(CreateTB_ReqAction(fbb, offsetOperation, offsetInputAction));
 
-	return CreatePacket(PROTOCOL::REQ_INPUT_ACTION, fbb);
+	return CreatePacket(PROTOCOL::REQ_ACTION, fbb);
+}
+
+Packet* PacketGenerator::CreateReqDamage()
+{
+	flatbuffers::FlatBufferBuilder fbb;
+
+	fbb.Finish(CreateTB_ReqDamage(fbb));
+
+	return CreatePacket(PROTOCOL::REQ_DAMAGE, fbb);
+}
+
+Packet* PacketGenerator::CreateReqRotate(const FVector& rotation)
+{
+	flatbuffers::FlatBufferBuilder fbb;
+
+	ST_Vec3 stRotation(rotation.X, rotation.Y, rotation.Z);
+
+	fbb.Finish(CreateTB_ReqRotate(fbb, &stRotation));
+
+	return CreatePacket(PROTOCOL::REQ_ROTATE, fbb);
 }
 
 Packet* PacketGenerator::CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb)
@@ -233,7 +257,9 @@ bool PacketGenerator::IsValidHeader(const PROTOCOL protocol)
 	case PROTOCOL::BCAST_EXIT_GAME_ROOM:
 	case PROTOCOL::BCAST_MOVE:
 	case PROTOCOL::BCAST_LOCATION_SYNC:
-	case PROTOCOL::BCAST_INPUT_ACTION:
+	case PROTOCOL::BCAST_ACTION:
+	case PROTOCOL::BCAST_HIT:
+	case PROTOCOL::BCAST_ROTATE:
 		return true;
 	}
 	return false;

@@ -24,12 +24,14 @@ void PacketService::Process(const Packet& packet)
 			TArray<UObjUser*> resultObjList;
 			for (auto it = objUserList->begin(); it != objUserList->end(); ++it)
 			{
-				wchar_t wUserId[SIZE_USER_USER_ID], wPassword[SIZE_USER_PASSWORD];
+				wchar_t wUserId[SIZE_USER_USER_ID];
 				TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, it->UserId()->c_str());
-				TPUtil::GetInstance().MultiByteToWChar(wPassword, SIZE_USER_PASSWORD, it->Password()->c_str());
-				auto newObjUser = UObjUser::Create(wUserId, wPassword);
-				auto newCompUserLocation = UCompUserLocation::Create(it->UserLocation()->Location()->x(), it->UserLocation()->Location()->y(), it->UserLocation()->Location()->z());
-				newObjUser->SetCompUserLocation(newCompUserLocation);
+				auto newObjUser = UObjUser::Create(wUserId);
+				auto newCompUserTransform = UCompUserTransform::Create(
+					{ it->UserTransform()->Location()->x(), it->UserTransform()->Location()->y(), it->UserTransform()->Location()->z() },
+					{ it->UserTransform()->Rotation()->x(), it->UserTransform()->Rotation()->y(), it->UserTransform()->Rotation()->z() }
+				);
+				newObjUser->SetCompUserTransform(newCompUserTransform);
 				resultObjList.Add(newObjUser);
 			}
 			recvCallResLogin(resultObjList);
@@ -50,12 +52,14 @@ void PacketService::Process(const Packet& packet)
 		auto objUser = req->ObjUser();
 		if (objUser)
 		{
-			wchar_t wUserId[SIZE_USER_USER_ID], wPassword[SIZE_USER_PASSWORD];
+			wchar_t wUserId[SIZE_USER_USER_ID];
 			TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, objUser->UserId()->c_str());
-			TPUtil::GetInstance().MultiByteToWChar(wPassword, SIZE_USER_PASSWORD, objUser->Password()->c_str());
-			auto newObjUser = UObjUser::Create(wUserId, wPassword);
-			auto newCompUserLocation = UCompUserLocation::Create(objUser->UserLocation()->Location()->x(), objUser->UserLocation()->Location()->y(), objUser->UserLocation()->Location()->z());
-			newObjUser->SetCompUserLocation(newCompUserLocation);
+			auto newObjUser = UObjUser::Create(wUserId);
+			auto newCompUserTransform = UCompUserTransform::Create(
+				{ objUser->UserTransform()->Location()->x(), objUser->UserTransform()->Location()->y(), objUser->UserTransform()->Location()->z() },
+				{ objUser->UserTransform()->Rotation()->x(), objUser->UserTransform()->Rotation()->y(), objUser->UserTransform()->Rotation()->z() }
+			);
+			newObjUser->SetCompUserTransform(newCompUserTransform);
 			recvCallBcastEnterGameRoom(newObjUser);
 		}
 		break;
@@ -92,10 +96,27 @@ void PacketService::Process(const Packet& packet)
 		recvCallBcastLocationSync(FString(wUserId), fLocation);
 		break;
 	}
-	case PROTOCOL::BCAST_INPUT_ACTION:
+	case PROTOCOL::BCAST_ACTION:
 	{
-		auto req = flatbuffers::GetRoot<TB_BcastInputAction>(packet.GetBody());
-		recvCallBcastInputAction(FBcastInputAction(*req));
+		auto req = flatbuffers::GetRoot<TB_BcastAction>(packet.GetBody());
+		recvCallBcastAction(FBcastAction(*req));
+		break;
+	}
+	case PROTOCOL::BCAST_HIT:
+	{
+		auto req = flatbuffers::GetRoot<TB_BcastHit>(packet.GetBody());
+		auto userId = req->UserId()->c_str();
+
+		wchar_t wUserId[SIZE_USER_USER_ID];
+		TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, userId);
+
+		recvCallBcastHit(FString(wUserId));
+		break;
+	}
+	case PROTOCOL::BCAST_ROTATE:
+	{
+		auto req = flatbuffers::GetRoot<TB_BcastRotate>(packet.GetBody());
+		recvCallBcastRotate(FBcastRotate(*req));
 		break;
 	}
 	default:
