@@ -49,9 +49,10 @@ enum class EOpMove : uint8
 UENUM(BlueprintType)
 enum class EOpAction : uint8
 {
-	None			UMETA(DisplayName = "None"),
-	Jump			UMETA(DisplayName = "Jump"),
-	Vaulting		UMETA(DisplayName = "Vaulting"),
-	DrawWeapon		UMETA(DisplayName = "DrawWeapon"),
-	MeleeAttack		UMETA(DisplayName = "MeleeAttack"),
+	None					UMETA(DisplayName = "None"),
+	Jump					UMETA(DisplayName = "Jump"),
+	Vaulting				UMETA(DisplayName = "Vaulting"),
+	DrawWeapon				UMETA(DisplayName = "DrawWeapon"),
+	MeleeAttack				UMETA(DisplayName = "MeleeAttack"),
+	MeleeAttackCombo		UMETA(DisplayName = "MeleeAttackCombo"),
 };
