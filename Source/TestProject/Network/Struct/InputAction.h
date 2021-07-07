@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../TP_generated.h"
+#include "../../Util/TPUtil.h"
 #include "InputAction.generated.h"
 
 USTRUCT(BlueprintType)
@@ -14,6 +15,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	FVector rotation;
+
+	UPROPERTY(BlueprintReadWrite)
+	FString comboSectionName;
 
 	FInputAction()
 	{
@@ -30,6 +34,10 @@ public:
 			InputAction.Rotation()->y(),
 			InputAction.Rotation()->z()
 		);
+		if (InputAction.ComboSectionName())
+		{
+			comboSectionName = FString(InputAction.ComboSectionName()->c_str());
+		}		
 	}
 
 	flatbuffers::Offset<TB_InputAction> Serialize(flatbuffers::FlatBufferBuilder& _fbb)
@@ -37,9 +45,20 @@ public:
 		ST_Vec3 stLocation(location.X, location.Y, location.Z);
 		ST_Vec3 stRotation(rotation.X, rotation.Y, rotation.Z);
 
+		flatbuffers::Offset<flatbuffers::String> offsetComboSectionName = 0;
+		const auto sectionNameBuffLen = comboSectionName.Len() + 1;
+		if (sectionNameBuffLen > 1)
+		{
+			auto cComboSectionName = new char[sectionNameBuffLen];
+			TPUtil::GetInstance().WCharToMultiByte(cComboSectionName, sectionNameBuffLen, *comboSectionName);
+			offsetComboSectionName = _fbb.CreateString((cComboSectionName));
+			delete[] cComboSectionName;
+		}		
+
 		TB_InputActionBuilder builder(_fbb);
 		builder.add_Location(&stLocation);
 		builder.add_Rotation(&stRotation);
+		builder.add_ComboSectionName(offsetComboSectionName);	
 		return builder.Finish();
 	}
 };

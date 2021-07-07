@@ -43,6 +43,7 @@ public:
 
 		userId = FString(wUserId);
 		operation = static_cast<EOpAction>(bcastAction.Operation());
+		inputAction = FInputAction(*bcastAction.InputAction());
 	}
 
 	flatbuffers::Offset<TB_BcastAction> Serialize(flatbuffers::FlatBufferBuilder& _fbb)
@@ -52,10 +53,12 @@ public:
 
 		auto offsetUserId = _fbb.CreateString(cUserId);
 		auto offsetOperation = GetOffsetOperation();
+		auto offsetInputAction = inputAction.Serialize(_fbb);
 
 		TB_BcastActionBuilder builder(_fbb);
 		builder.add_UserId(offsetUserId);
 		builder.add_Operation(offsetOperation);
+		builder.add_InputAction(offsetInputAction);
 		return builder.Finish();
 	}
 
