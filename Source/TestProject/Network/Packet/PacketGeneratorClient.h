@@ -12,11 +12,11 @@ using namespace std;
 class PacketGeneratorClient : public PacketGenerator, public TSingleton<PacketGeneratorClient>
 {
 public:
-	Packet* CreateReqLogin(const string& userId, const string& password);
-	Packet* CreateReqMove(FBcastMove& bcastMove);
-	Packet* CreateReqMoveSync(const FVector& location);
-	Packet* CreateReqRoundTripTime();
-	Packet* CreateReqAction(FBcastAction& bcastAction);
-	Packet* CreateReqDamage();
-	Packet* CreateReqRotate(const FVector& rotation);
+	Packet CreateReqLogin(const string& userId, const string& password);
+	Packet CreateReqMove(FBcastMove& bcastMove);
+	Packet CreateReqMoveSync(const FVector& location);
+	Packet CreateReqRoundTripTime();
+	Packet CreateReqAction(FBcastAction& bcastAction);
+	Packet CreateReqDamage();
+	Packet CreateReqRotate(const FVector& rotation);
 };

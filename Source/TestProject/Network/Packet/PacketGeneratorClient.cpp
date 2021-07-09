@@ -1,7 +1,7 @@
 #include "PacketGeneratorClient.h"
 #include "../../Util/TPUtil.h"
 
-Packet* PacketGeneratorClient::CreateReqLogin(const string& userId, const string& password)
+Packet PacketGeneratorClient::CreateReqLogin(const string& userId, const string& password)
 {
 	flatbuffers::FlatBufferBuilder fbb;
 
@@ -13,7 +13,7 @@ Packet* PacketGeneratorClient::CreateReqLogin(const string& userId, const string
 	return CreatePacket(PROTOCOL::REQ_LOGIN, fbb, nullptr);
 }
 
-Packet* PacketGeneratorClient::CreateReqMove(FBcastMove& bcastMove)
+Packet PacketGeneratorClient::CreateReqMove(FBcastMove& bcastMove)
 {
 	flatbuffers::FlatBufferBuilder fbb;
 
@@ -25,7 +25,7 @@ Packet* PacketGeneratorClient::CreateReqMove(FBcastMove& bcastMove)
 	return CreatePacket(PROTOCOL::REQ_MOVE, fbb, nullptr);
 }
 
-Packet* PacketGeneratorClient::CreateReqMoveSync(const FVector& location)
+Packet PacketGeneratorClient::CreateReqMoveSync(const FVector& location)
 {
 	flatbuffers::FlatBufferBuilder fbb;
 
@@ -36,7 +36,7 @@ Packet* PacketGeneratorClient::CreateReqMoveSync(const FVector& location)
 	return CreatePacket(PROTOCOL::REQ_LOCATION_SYNC, fbb, nullptr);
 }
 
-Packet* PacketGeneratorClient::CreateReqRoundTripTime()
+Packet PacketGeneratorClient::CreateReqRoundTripTime()
 {
 	flatbuffers::FlatBufferBuilder fbb;
 
@@ -47,7 +47,7 @@ Packet* PacketGeneratorClient::CreateReqRoundTripTime()
 	return CreatePacket(PROTOCOL::REQ_ROUND_TRIP_TIME, fbb, nullptr);
 }
 
-Packet* PacketGeneratorClient::CreateReqAction(FBcastAction& bcastAction)
+Packet PacketGeneratorClient::CreateReqAction(FBcastAction& bcastAction)
 {
 	flatbuffers::FlatBufferBuilder fbb;
 
@@ -59,7 +59,7 @@ Packet* PacketGeneratorClient::CreateReqAction(FBcastAction& bcastAction)
 	return CreatePacket(PROTOCOL::REQ_ACTION, fbb, nullptr);
 }
 
-Packet* PacketGeneratorClient::CreateReqDamage()
+Packet PacketGeneratorClient::CreateReqDamage()
 {
 	flatbuffers::FlatBufferBuilder fbb;
 
@@ -68,7 +68,7 @@ Packet* PacketGeneratorClient::CreateReqDamage()
 	return CreatePacket(PROTOCOL::REQ_DAMAGE, fbb, nullptr);
 }
 
-Packet* PacketGeneratorClient::CreateReqRotate(const FVector& rotation)
+Packet PacketGeneratorClient::CreateReqRotate(const FVector& rotation)
 {
 	flatbuffers::FlatBufferBuilder fbb;
 

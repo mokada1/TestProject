@@ -136,17 +136,17 @@ vector<Packet*> PacketGenerator::Parse(Session* const owner, char* const buffer,
 	return packetList;
 }
 
-Packet* PacketGenerator::CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb, Session* const owner)
+Packet PacketGenerator::CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb, Session* const owner)
 {
 	return CreatePacket(header, _fbb, owner, PacketCastType::UNICAST, vector<Session*>());
 }
 
-Packet* PacketGenerator::CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb, Session* const owner, PacketCastType packetCastType)
+Packet PacketGenerator::CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb, Session* const owner, PacketCastType packetCastType)
 {
 	return CreatePacket(header, _fbb, owner, packetCastType, vector<Session*>());
 }
 
-Packet* PacketGenerator::CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb, Session* const owner, PacketCastType packetCastType, vector<Session*> packetCastGroup)
+Packet PacketGenerator::CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb, Session* const owner, PacketCastType packetCastType, vector<Session*> packetCastGroup)
 {
 	auto bp = _fbb.GetBufferPointer();
 	auto bSize = static_cast<size_t>(_fbb.GetSize());
@@ -163,7 +163,7 @@ Packet* PacketGenerator::CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBu
 
 	auto packetInfo = PacketInfo(buffer, BUFF_DATA_SIZE, header);
 	auto packetSubInfo = PacketSubInfo(owner, packetCastType, packetCastGroup);
-	return new Packet(packetInfo, packetSubInfo);
+	return Packet(packetInfo, packetSubInfo);
 }
 
 PROTOCOL PacketGenerator::GetHeaderByBuff(char* const buffer)

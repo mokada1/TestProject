@@ -19,6 +19,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Network)
 	bool GetIsConnected() const;
 
+	UFUNCTION(BlueprintCallable, Category = Network)
+	void Process();
+
 	bool SendPacket(const Packet& packet);
 
 	Session* GetSession() const;

@@ -29,18 +29,31 @@ void PacketProcessor::Parse(char* const buffer, const size_t recvBytes)
 
 		TPLogger::GetInstance().PrintLog("Recv packet:%s", strHeader);
 
-		PacketService::GetInstance().Process(*packet);
-		delete packet;
+		packetQueue.Enqueue(packet);
 	}
 }
 
-bool PacketProcessor::SendPacket(Packet* const packet)
+bool PacketProcessor::Process()
+{
+	if (!client || packetQueue.IsEmpty())
+	{
+		return false;
+	}
+	Packet* packet = nullptr;
+	if (packetQueue.Dequeue(packet))
+	{
+		PacketService::GetInstance().Process(*packet);
+		delete packet;
+		return true;
+	}
+	return false;
+}
+
+bool PacketProcessor::SendPacket(const Packet& packet)
 {
 	if (!client)
 	{
 		return false;
 	}
-	auto result = client->SendPacket(*packet);
-	delete packet;
-	return result;
+	return client->SendPacket(packet);
 }

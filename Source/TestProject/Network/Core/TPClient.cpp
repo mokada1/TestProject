@@ -118,6 +118,11 @@ bool ATPClient::GetIsConnected() const
     return isConnected;
 }
 
+void ATPClient::Process()
+{
+    while(PacketProcessor::GetInstance().Process());
+}
+
 bool ATPClient::SendPacket(const Packet& packet)
 {
     if (!rsThread || !rsThread->IsRunning())

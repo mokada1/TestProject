@@ -10,9 +10,13 @@ class PacketProcessor : public TSingleton<PacketProcessor>
 public:
 	void SetClient(ATPClient* const _client);
 	void Parse(char* const buffer, const size_t recvBytes);
-	bool SendPacket(Packet* const packet);
+	bool Process();
+	bool SendPacket(const Packet& packet);
 
 private:
 	UPROPERTY()
 	ATPClient* client;
+
+	UPROPERTY()
+	TQueue<Packet*> packetQueue;
 };
