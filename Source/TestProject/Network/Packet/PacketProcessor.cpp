@@ -1,7 +1,8 @@
 #include "PacketProcessor.h"
 #include "../Core/TPClient.h"
-#include "PacketGenerator.h"
+#include "PacketGeneratorClient.h"
 #include "PacketService.h"
+#include "../../Util/TPLogger.h"
 
 void PacketProcessor::SetClient(ATPClient* const _client)
 {
@@ -14,17 +15,23 @@ void PacketProcessor::Parse(char* const buffer, const size_t recvBytes)
 	{
 		return;
 	}
-	auto packet = PacketGenerator::GetInstance().Parse(client->GetSession(), buffer, recvBytes);
-	if (!packet)
+
+	auto packetList = PacketGeneratorClient::GetInstance().Parse(client->GetSession(), buffer, recvBytes);
+	if (packetList.empty())
 	{
 		return;
 	}
-	if (!packet->IsValid())
+
+	for (auto packet : packetList)
 	{
+		auto header = packet->GetHeader();
+		auto strHeader = TPUtil::GetInstance().EnumToString(header);
+
+		TPLogger::GetInstance().PrintLog("Recv packet:%s", strHeader);
+
+		PacketService::GetInstance().Process(*packet);
 		delete packet;
-		return;
 	}
-	packetRecvQueue.Enqueue(packet);
 }
 
 bool PacketProcessor::SendPacket(Packet* const packet)
@@ -33,58 +40,7 @@ bool PacketProcessor::SendPacket(Packet* const packet)
 	{
 		return false;
 	}
-	packetSendQueue.Enqueue(packet);
-	return true;
-}
-
-bool PacketProcessor::ProcRecvPacket()
-{
-	if (packetRecvQueue.IsEmpty())
-	{
-		return false;
-	}
-	Packet* packet = nullptr;
-	if (packetRecvQueue.Dequeue(packet))
-	{
-		PacketService::GetInstance().Process(*packet);
-		delete packet;
-		return true;
-	}
-	return false;
-}
-
-bool PacketProcessor::ProcSendPacket()
-{
-	if (!client || packetSendQueue.IsEmpty())
-	{
-		return false;
-	}
-	bool result = false;
-	Packet* packet = nullptr;
-	if (packetSendQueue.Dequeue(packet))
-	{
-		result = client->SendPacket(*packet);
-		delete packet;
-	}
+	auto result = client->SendPacket(*packet);
+	delete packet;
 	return result;
-}
-
-void PacketProcessor::Close()
-{
-	while (!packetSendQueue.IsEmpty())
-	{
-		Packet* packet = nullptr;
-		if (packetSendQueue.Dequeue(packet))
-		{
-			delete packet;
-		}
-	}
-	while (!packetRecvQueue.IsEmpty())
-	{
-		Packet* packet = nullptr;
-		if (packetRecvQueue.Dequeue(packet))
-		{
-			delete packet;
-		}
-	}
 }

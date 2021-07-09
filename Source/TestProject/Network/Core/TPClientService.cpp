@@ -3,9 +3,10 @@
 #include "TPClientService.h"
 #include "../Packet/PacketProcessor.h"
 #include "../Packet/PacketService.h"
-#include "../Packet/PacketGenerator.h"
+#include "../Packet/PacketGeneratorClient.h"
 #include "../../Object/ObjUser.h"
 #include "../../Core/TPCharacter.h"
+#include "../../Util/TPLogger.h"
 
 bool ATPClientService::ReqLogin(const FString& _userId, const FString& _password)
 {
@@ -17,7 +18,7 @@ bool ATPClientService::ReqLogin(const FString& _userId, const FString& _password
 	TPUtil::GetInstance().WCharToMultiByte(cUserId, SIZE_USER_USER_ID, *_userId);
 	TPUtil::GetInstance().WCharToMultiByte(cPassword, SIZE_USER_PASSWORD, *_password);
 
-	auto packet = PacketGenerator::GetInstance().CreateReqLogin(cUserId, cPassword);
+	auto packet = PacketGeneratorClient::GetInstance().CreateReqLogin(cUserId, cPassword);
 	auto result = PacketProcessor::GetInstance().SendPacket(packet);
 
 	if (result)
@@ -38,7 +39,7 @@ bool ATPClientService::ReqMove(const EOpMove operation, const FInputMove& inputM
 		
 	FBcastMove bcastMove(propUserId, operation, inputMove);
 
-	auto packet = PacketGenerator::GetInstance().CreateReqMove(bcastMove);
+	auto packet = PacketGeneratorClient::GetInstance().CreateReqMove(bcastMove);
 	return PacketProcessor::GetInstance().SendPacket(packet);
 }
 
@@ -49,7 +50,7 @@ bool ATPClientService::ReqMoveSync(const FVector& location)
 		return false;
 	}
 
-	auto packet = PacketGenerator::GetInstance().CreateReqMoveSync(location);
+	auto packet = PacketGeneratorClient::GetInstance().CreateReqMoveSync(location);
 	return PacketProcessor::GetInstance().SendPacket(packet);
 }
 
@@ -60,7 +61,7 @@ bool ATPClientService::ReqRoundTripTime()
 		return false;
 	}
 
-	auto packet = PacketGenerator::GetInstance().CreateReqRoundTripTime();
+	auto packet = PacketGeneratorClient::GetInstance().CreateReqRoundTripTime();
 	return PacketProcessor::GetInstance().SendPacket(packet);
 }
 
@@ -73,7 +74,7 @@ bool ATPClientService::ReqAction(const EOpAction operation, const FInputAction& 
 
 	FBcastAction bcastAction(propUserId, operation, inputAction);
 
-	auto packet = PacketGenerator::GetInstance().CreateReqAction(bcastAction);
+	auto packet = PacketGeneratorClient::GetInstance().CreateReqAction(bcastAction);
 	return PacketProcessor::GetInstance().SendPacket(packet);
 }
 
@@ -84,7 +85,7 @@ bool ATPClientService::ReqDamage()
 		return false;
 	}
 
-	auto packet = PacketGenerator::GetInstance().CreateReqDamage();
+	auto packet = PacketGeneratorClient::GetInstance().CreateReqDamage();
 	return PacketProcessor::GetInstance().SendPacket(packet);
 }
 
@@ -95,7 +96,7 @@ bool ATPClientService::ReqRotate(const FVector& rotation)
 		return false;
 	}
 
-	auto packet = PacketGenerator::GetInstance().CreateReqRotate(rotation);
+	auto packet = PacketGeneratorClient::GetInstance().CreateReqRotate(rotation);
 	return PacketProcessor::GetInstance().SendPacket(packet);
 }
 
@@ -161,10 +162,16 @@ void ATPClientService::UpdateRtt(const int64 serverTimeMs, const int64 rttMsC2S)
 		return;
 	}
 
+	if (rttCount >= MAX_RTT_COUNT)
+	{
+		totalRttMs = 0;
+		rttCount = 0;
+	}
 	totalRttMs += rttMs;
 	rttCount++;
 	avgRttMs = totalRttMs / rttCount;
-	UE_LOG(LogTemp, Log, TEXT("rttMsC2S:%lld rttMsS2C:%lld avgRttMs:%lld"), rttMsC2S, rttMsS2C, avgRttMs);
+
+	TPLogger::GetInstance().PrintLog("rttMsC2S:%lld rttMsS2C:%lld avgRttMs:%lld", rttMsC2S, rttMsS2C, avgRttMs);
 }
 
 void ATPClientService::CallError(const FString& message)

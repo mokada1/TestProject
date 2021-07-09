@@ -17,9 +17,6 @@ public:
 	bool CreateClientAndConnect(const FString& _serverIp, const FString& _serverPort);
 
 	UFUNCTION(BlueprintCallable, Category = Network)
-	void ProcRecvPackets();
-
-	UFUNCTION(BlueprintCallable, Category = Network)
 	bool GetIsConnected() const;
 
 	bool SendPacket(const Packet& packet);
@@ -33,7 +30,7 @@ protected:
 private:
 	bool Initialize(const FString& _serverIp, const FString& _serverPort);
 	bool Connect();
-	bool Close();	
+	void Close();	
 
 	bool isConnected;
 
@@ -45,8 +42,5 @@ private:
 	Session* session;
 
 	UPROPERTY()
-	USocketRSThread* recvThread;
-
-	UPROPERTY()
-	USocketRSThread* sendThread;
+	USocketRSThread* rsThread;
 };

@@ -27,7 +27,7 @@ public:
 	virtual void Stop() override;
 	virtual void Exit() override;
 
-	void Start(SOCKET socket, bool _isRecvThread);
+	void Start(SOCKET socket);
 	bool SendPacket(const Packet& packet);
 
 	bool IsRunning();
@@ -37,7 +37,6 @@ private:
 	SOCKET hSocket;
 	bool isStopThread;
 	FRunnableThread* thread;
-	bool isRecvThread;
 };
 
 typedef struct

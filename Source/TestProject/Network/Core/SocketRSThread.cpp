@@ -20,25 +20,13 @@ bool USocketRSThread::Init()
 
 uint32 USocketRSThread::Run()
 {	
-	if (isRecvThread)
+	while (!isStopThread)
 	{
-		while (!isStopThread)
+		if (!RecvPacket())
 		{
-			if (!RecvPacket())
-			{
-				break;
-			}
+			break;
 		}
 	}
-	else
-	{
-		while (!isStopThread)
-		{
-			PacketProcessor::GetInstance().ProcSendPacket();
-			FPlatformProcess::Sleep(0.01f);
-		}
-	}
-
 	return 0;
 }
 
@@ -56,10 +44,9 @@ bool USocketRSThread::IsRunning()
 	return thread && !isStopThread;
 }
 
-void USocketRSThread::Start(SOCKET socket, bool _isRecvThread)
+void USocketRSThread::Start(SOCKET socket)
 {
 	this->hSocket = socket;
-	this->isRecvThread = _isRecvThread;
 	thread = FRunnableThread::Create(this, TEXT("USocketRSThread"));
 }
 
@@ -70,7 +57,6 @@ bool USocketRSThread::SendPacket(const Packet& packet)
 	DWORD flags = 0;
 
 	memset(&(perIoData.overlapped), 0, sizeof(OVERLAPPED));
-	//perIoData.overlapped.hEvent = WSACreateEvent();
 	perIoData.wsaBuf.len = static_cast<ULONG>(packet.GetPacketSize());
 	perIoData.wsaBuf.buf = packet.GetBuffer();
 	perIoData.operation = OP_ClientToServer;
@@ -84,10 +70,6 @@ bool USocketRSThread::SendPacket(const Packet& packet)
 			return false;
 		}
 	}
-
-	//WSAWaitForMultipleEvents(1, &perIoData.overlapped.hEvent, true, WSA_INFINITE, false);
-
-	//WSAGetOverlappedResult(hSocket, &perIoData.overlapped, &sendBytes, false, &flags);
 
 	TPLogger::GetInstance().PrintLog("Number of bytes transferred:%d", sendBytes);
 		

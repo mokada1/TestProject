@@ -73,10 +73,8 @@ bool ATPClient::Connect()
 
     session = new Session(hSocket, recvAddr);
 
-    recvThread = NewObject<USocketRSThread>();
-    recvThread->Start(hSocket, true);
-    sendThread = NewObject<USocketRSThread>();
-    sendThread->Start(hSocket, false);
+    rsThread = NewObject<USocketRSThread>();
+    rsThread->Start(hSocket);
 
     PacketProcessor::GetInstance().SetClient(this);
 
@@ -88,39 +86,31 @@ bool ATPClient::Connect()
 void ATPClient::CallEndPlay(const EEndPlayReason::Type endPlayReason)
 {
 	Close();
+}
+
+void ATPClient::Close()
+{
+	if (hSocket)
+	{
+        if (rsThread && rsThread->IsRunning())
+        {
+            rsThread->Stop();
+            rsThread = nullptr;
+        }
+        closesocket(hSocket);
+	}
+    
+    WSACleanup();   
+
     if (session)
     {
         delete session;
         session = nullptr;
     }
+    
     PacketProcessor::GetInstance().SetClient(nullptr);
+    
     isConnected = false;
-}
-
-bool ATPClient::Close()
-{
-    PacketProcessor::GetInstance().Close();
-	if (hSocket)
-	{
-        if (recvThread && recvThread->IsRunning())
-        {
-            recvThread->Stop();
-            recvThread = nullptr;
-        }
-        if (sendThread && sendThread->IsRunning())
-        {
-            sendThread->Stop();
-            sendThread = nullptr;
-        }
-        closesocket(hSocket);
-	}
-    WSACleanup();   
-    return true;
-}
-
-void ATPClient::ProcRecvPackets()
-{
-    while (PacketProcessor::GetInstance().ProcRecvPacket());
 }
 
 bool ATPClient::GetIsConnected() const
@@ -130,11 +120,11 @@ bool ATPClient::GetIsConnected() const
 
 bool ATPClient::SendPacket(const Packet& packet)
 {
-    if (!sendThread || !sendThread->IsRunning())
+    if (!rsThread || !rsThread->IsRunning())
     {
         return false;
     }
-	return sendThread->SendPacket(packet);
+	return rsThread->SendPacket(packet);
 }
 
 Session* ATPClient::GetSession() const

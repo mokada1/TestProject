@@ -1,34 +1,19 @@
 #pragma once
 
-#include "../../Util/TSingleton.h"
 #include "Packet.h"
 #include "../../TP_generated.h"
-#include "../Struct/BcastMove.h"
-#include "../Struct/BcastAction.h"
-#include "../Struct/BcastRotate.h"
-#include <string>
 
-using namespace std;
-
-class Session;
-
-class PacketGenerator : public TSingleton<PacketGenerator>
+class PacketGenerator
 {
 public:
-	Packet* Parse(Session* const owner, char* const buffer, const size_t recvBytes);
+	vector<Packet*> Parse(Session* const owner, char* const buffer, const size_t recvBytes);
 
-	Packet* CreateReqLogin(const string& userId, const string& password);
-	Packet* CreateReqMove(FBcastMove& bcastMove);
-	Packet* CreateReqMoveSync(const FVector& location);
-	Packet* CreateReqRoundTripTime();
-	Packet* CreateReqAction(FBcastAction& bcastAction);
-	Packet* CreateReqDamage();
-	Packet* CreateReqRotate(const FVector& rotation);
-	
-private:	
-	Packet* CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb);
+protected:
+	Packet* CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb, Session* const owner, PacketCastType packetCastType);
+	Packet* CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb, Session* const owner);
+	Packet* CreatePacket(PROTOCOL header, flatbuffers::FlatBufferBuilder& _fbb, Session* const owner, PacketCastType packetCastType, vector<Session*> packetCastGroup);
 	PROTOCOL GetHeaderByBuff(char* const buffer);
-	PROTOCOL GetEndOfPacket(char* const buffer, const size_t packetSize);
+	PROTOCOL GetEndOfPacket(char* const buffer, const size_t buffSize, size_t& packetSize);
 	void SetHeaderOfBuff(char* const buffer, PROTOCOL header);
 	void SetEndOfBuff(char* const buffer, const size_t buffSize);
 	bool IsValidHeader(const PROTOCOL protocol);

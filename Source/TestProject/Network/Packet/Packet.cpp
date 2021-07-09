@@ -1,7 +1,4 @@
 #include "Packet.h"
-#include <cstring>
-
-using namespace std;
 
 Packet::Packet()
 {
@@ -39,6 +36,9 @@ Packet::Packet(const PacketInfo& packetInfo, const PacketSubInfo& packetSubInfo)
 	this->body = &_buffer[PACKET_HEAD_SIZE];
 	this->buffer = _buffer;
 	this->packetSize = packetInfo.GetPacketSize();
+	this->owner = packetSubInfo.GetOwner();
+	this->packetCastType = packetSubInfo.GetPacketCastType();
+	this->packetCastGroup = packetSubInfo.GetPacketCastGroup();
 	this->isDAllocBuf = packetSubInfo.GetIsDAllocBuf();
 }
 
@@ -70,6 +70,21 @@ size_t Packet::GetPacketSize() const
 	return packetSize;
 }
 
+Session* Packet::GetOwner() const
+{
+	return owner;
+}
+
+PacketCastType Packet::GetPacketCastType() const
+{
+	return packetCastType;
+}
+
+vector<Session*> Packet::GetPacketCastGroup() const
+{
+	return packetCastGroup;
+}
+
 bool Packet::IsValid() const
 {
 	return packetSize > 0 && buffer != nullptr && packetSize <= MAX_BUFF_SIZE;
@@ -81,6 +96,9 @@ void Packet::Clear()
 	body = nullptr;
 	buffer = nullptr;
 	packetSize = 0;
+	owner = nullptr;
+	packetCastType = PacketCastType::UNICAST;
+	if (!packetCastGroup.empty()) packetCastGroup.clear();
 	isDAllocBuf = false;
 }
 
@@ -109,5 +127,8 @@ void Packet::Alloc(const Packet& rhs)
 	}
 	header = rhs.header;
 	packetSize = rhs.packetSize;
+	owner = rhs.owner;
+	packetCastType = rhs.packetCastType;
+	packetCastGroup = rhs.packetCastGroup;
 	isDAllocBuf = rhs.isDAllocBuf;
 }
