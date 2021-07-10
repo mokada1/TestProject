@@ -19,6 +19,9 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FString comboSectionName;
 
+	UPROPERTY(BlueprintReadWrite)
+	bool isCombatPosture;
+
 	FInputAction()
 	{
 		location = FVector(0.f, 0.f, 0.f);
@@ -37,7 +40,8 @@ public:
 		if (InputAction.ComboSectionName())
 		{
 			comboSectionName = FString(InputAction.ComboSectionName()->c_str());
-		}		
+		}
+		isCombatPosture = InputAction.IsCombatPosture();
 	}
 
 	flatbuffers::Offset<TB_InputAction> Serialize(flatbuffers::FlatBufferBuilder& _fbb)
@@ -59,6 +63,7 @@ public:
 		builder.add_Location(&stLocation);
 		builder.add_Rotation(&stRotation);
 		builder.add_ComboSectionName(offsetComboSectionName);	
+		builder.add_IsCombatPosture(isCombatPosture);
 		return builder.Finish();
 	}
 };

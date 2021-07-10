@@ -2,6 +2,7 @@
 
 #include "TPObject.h"
 #include "../Component/CompUserTransform.h"
+#include "../Component/CompUserCondition.h"
 #include "ObjUser.generated.h"
 
 UCLASS(BlueprintType)
@@ -14,7 +15,10 @@ public:
 	FString BP_GetUserId() const;
 
 	UFUNCTION(BlueprintCallable)
-	UCompUserTransform* BP_GetCompUserTransform() const;
+	UCompUserTransform* BP_GetCompTransform() const;
+
+	UFUNCTION(BlueprintCallable)
+	UCompUserCondition* BP_GetCompCondition() const;
 
 	virtual wchar_t* GetObjectId() const override;
 	virtual bool IsValid() const override;
@@ -25,13 +29,17 @@ public:
 
 	wchar_t* GetUserId() const;
 
-	UCompUserTransform* GetCompUserTransform() const;
-	void SetCompUserTransform(UCompUserTransform* const _userTransform);
+	UCompUserTransform* GetCompTransform() const;
+	UCompUserCondition* GetCompCondition() const;
+
+	void SetCompTransform(UCompUserTransform* const _compTransform);
+	void SetCompCondition(UCompUserCondition* const _compCondition);
 
 private:
 	void Init();
 	void Init(wchar_t* const _userId);
 
 	wchar_t* userId;
-	UCompUserTransform* userTransform;
+	UCompUserTransform* compTransform;
+	UCompUserCondition* compCondition;
 };

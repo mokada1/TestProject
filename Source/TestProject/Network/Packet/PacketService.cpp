@@ -27,11 +27,13 @@ void PacketService::Process(const Packet& packet)
 				wchar_t wUserId[SIZE_USER_USER_ID];
 				TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, it->UserId()->c_str());
 				auto newObjUser = UObjUser::Create(wUserId);
-				auto newCompUserTransform = UCompUserTransform::Create(
-					{ it->UserTransform()->Location()->x(), it->UserTransform()->Location()->y(), it->UserTransform()->Location()->z() },
-					{ it->UserTransform()->Rotation()->x(), it->UserTransform()->Rotation()->y(), it->UserTransform()->Rotation()->z() }
+				auto newCompTransform = UCompUserTransform::Create(
+					{ it->Transform()->Location()->x(), it->Transform()->Location()->y(), it->Transform()->Location()->z() },
+					{ it->Transform()->Rotation()->x(), it->Transform()->Rotation()->y(), it->Transform()->Rotation()->z() }
 				);
-				newObjUser->SetCompUserTransform(newCompUserTransform);
+				auto newCompCondition = UCompUserCondition::Create(it->Condition()->IsCombatPosture());
+				newObjUser->SetCompTransform(newCompTransform);
+				newObjUser->SetCompCondition(newCompCondition);
 				resultObjList.Add(newObjUser);
 			}
 			recvCallResLogin(resultObjList);
@@ -55,11 +57,13 @@ void PacketService::Process(const Packet& packet)
 			wchar_t wUserId[SIZE_USER_USER_ID];
 			TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, objUser->UserId()->c_str());
 			auto newObjUser = UObjUser::Create(wUserId);
-			auto newCompUserTransform = UCompUserTransform::Create(
-				{ objUser->UserTransform()->Location()->x(), objUser->UserTransform()->Location()->y(), objUser->UserTransform()->Location()->z() },
-				{ objUser->UserTransform()->Rotation()->x(), objUser->UserTransform()->Rotation()->y(), objUser->UserTransform()->Rotation()->z() }
+			auto newCompTransform = UCompUserTransform::Create(
+				{ objUser->Transform()->Location()->x(), objUser->Transform()->Location()->y(), objUser->Transform()->Location()->z() },
+				{ objUser->Transform()->Rotation()->x(), objUser->Transform()->Rotation()->y(), objUser->Transform()->Rotation()->z() }
 			);
-			newObjUser->SetCompUserTransform(newCompUserTransform);
+			auto newCompCondition = UCompUserCondition::Create(objUser->Condition()->IsCombatPosture());
+			newObjUser->SetCompTransform(newCompTransform);
+			newObjUser->SetCompCondition(newCompCondition);
 			recvCallBcastEnterGameRoom(newObjUser);
 		}
 		break;

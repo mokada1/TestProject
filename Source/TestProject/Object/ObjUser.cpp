@@ -6,9 +6,14 @@ FString UObjUser::BP_GetUserId() const
 	return FString(userId);
 }
 
-UCompUserTransform* UObjUser::BP_GetCompUserTransform() const
+UCompUserTransform* UObjUser::BP_GetCompTransform() const
 {
-	return userTransform;
+	return compTransform;
+}
+
+UCompUserCondition* UObjUser::BP_GetCompCondition() const
+{
+	return compCondition;
 }
 
 wchar_t* UObjUser::GetObjectId() const
@@ -27,14 +32,13 @@ flatbuffers::Offset<TB_ObjUser> UObjUser::SerializeFB(flatbuffers::FlatBufferBui
 	TPUtil::GetInstance().WCharToChar(cUserId, SIZE_USER_USER_ID, userId);
 	
 	auto offsetUserId = _fbb.CreateString(cUserId);
-	auto offsetUserTransform = userTransform ? userTransform->SerializeFB(_fbb) : 0;
+	auto offsetTransform = compTransform ? compTransform->SerializeFB(_fbb) : 0;
+	auto offsetCondition = compCondition ? compCondition->SerializeFB(_fbb) : 0;
 
 	TB_ObjUserBuilder builder(_fbb);
 	builder.add_UserId(offsetUserId);
-	if (!offsetUserTransform.IsNull())
-	{
-		builder.add_UserTransform(offsetUserTransform);
-	}
+	builder.add_Transform(offsetTransform);
+	builder.add_Condition(offsetCondition);
 	return builder.Finish();
 }
 
@@ -48,14 +52,16 @@ UObjUser* UObjUser::Create(wchar_t* const _userId)
 void UObjUser::Init()
 {
 	this->userId = nullptr;
-	this->userTransform = nullptr;
+	this->compTransform = nullptr;
+	this->compCondition = nullptr;
 }
 
 void UObjUser::Init(wchar_t* const _userId)
 {
 	this->userId = new wchar_t[SIZE_USER_USER_ID];
 	wcscpy_s(this->userId, SIZE_USER_USER_ID, _userId);
-	this->userTransform = nullptr;
+	this->compTransform = nullptr;
+	this->compCondition = nullptr;
 }
 
 UObjUser::~UObjUser()
@@ -71,12 +77,22 @@ wchar_t* UObjUser::GetUserId() const
 	return this->userId;
 }
 
-UCompUserTransform* UObjUser::GetCompUserTransform() const
+UCompUserTransform* UObjUser::GetCompTransform() const
 {
-	return this->userTransform;
+	return this->compTransform;
 }
 
-void UObjUser::SetCompUserTransform(UCompUserTransform* const _userTransform)
+UCompUserCondition* UObjUser::GetCompCondition() const
 {
-	this->userTransform = _userTransform;
+	return this->compCondition;
+}
+
+void UObjUser::SetCompTransform(UCompUserTransform* const _compTransform)
+{
+	this->compTransform = _compTransform;
+}
+
+void UObjUser::SetCompCondition(UCompUserCondition* const _compCondition)
+{
+	this->compCondition = _compCondition;
 }
