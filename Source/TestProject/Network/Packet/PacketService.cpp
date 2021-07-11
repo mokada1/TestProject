@@ -89,15 +89,7 @@ void PacketService::Process(const Packet& packet)
 	case PROTOCOL::BCAST_LOCATION_SYNC:
 	{
 		auto req = flatbuffers::GetRoot<TB_BcastLocationSync>(packet.GetBody());
-		auto userId = req->UserId()->c_str();
-		auto location = req->Location();
-
-		wchar_t wUserId[SIZE_USER_USER_ID];
-		TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, userId);
-
-		FVector fLocation(location->x(), location->y(), location->z());
-
-		recvCallBcastLocationSync(FString(wUserId), fLocation);
+		recvCallBcastLocationSync(FBcastLocationSync(*req));
 		break;
 	}
 	case PROTOCOL::BCAST_ACTION:
@@ -117,10 +109,10 @@ void PacketService::Process(const Packet& packet)
 		recvCallBcastHit(FString(wUserId));
 		break;
 	}
-	case PROTOCOL::BCAST_ROTATE:
+	case PROTOCOL::BCAST_ROTATION_SYNC:
 	{
-		auto req = flatbuffers::GetRoot<TB_BcastRotate>(packet.GetBody());
-		recvCallBcastRotate(FBcastRotate(*req));
+		auto req = flatbuffers::GetRoot<TB_BcastRotationSync>(packet.GetBody());
+		recvCallBcastRotationSync(FBcastRotationSync(*req));
 		break;
 	}
 	default:

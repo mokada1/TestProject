@@ -38,7 +38,7 @@ private:
 	bool isConnected;
 
 	char* serverIp;
-	uint8_t serverPort;
+	uint16_t serverPort;
 	
 	SOCKET hSocket;
 	SOCKADDR_IN recvAddr;

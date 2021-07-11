@@ -43,14 +43,14 @@ bool ATPClientService::ReqMove(const EOpMove operation, const FInputMove& inputM
 	return PacketProcessor::GetInstance().SendPacket(packet);
 }
 
-bool ATPClientService::ReqMoveSync(const FVector& location)
+bool ATPClientService::ReqLocationSync(const FVector& location)
 {
 	if (!isLogined)
 	{
 		return false;
 	}
 
-	auto packet = PacketGeneratorClient::GetInstance().CreateReqMoveSync(location);
+	auto packet = PacketGeneratorClient::GetInstance().CreateReqLocationSync(location);
 	return PacketProcessor::GetInstance().SendPacket(packet);
 }
 
@@ -89,14 +89,14 @@ bool ATPClientService::ReqDamage()
 	return PacketProcessor::GetInstance().SendPacket(packet);
 }
 
-bool ATPClientService::ReqRotate(const FVector& rotation)
+bool ATPClientService::ReqRotationSync(const FVector& rotation)
 {
 	if (!isLogined)
 	{
 		return false;
 	}
 
-	auto packet = PacketGeneratorClient::GetInstance().CreateReqRotate(rotation);
+	auto packet = PacketGeneratorClient::GetInstance().CreateReqRotationSync(rotation);
 	return PacketProcessor::GetInstance().SendPacket(packet);
 }
 
@@ -130,10 +130,10 @@ void ATPClientService::SetRecvCallback()
 	PacketService::GetInstance().recvCallBcastEnterGameRoom += std::bind(&ATPClientService::CallBcastEnterGameRoom, this, std::placeholders::_1);
 	PacketService::GetInstance().recvCallBcastExitGameRoom += std::bind(&ATPClientService::CallBcastExitGameRoom, this, std::placeholders::_1);
 	PacketService::GetInstance().recvCallBcastMove += std::bind(&ATPClientService::CallBcastMove, this, std::placeholders::_1);
-	PacketService::GetInstance().recvCallBcastLocationSync += std::bind(&ATPClientService::CallBcastLocationSync, this, std::placeholders::_1, std::placeholders::_2);
+	PacketService::GetInstance().recvCallBcastLocationSync += std::bind(&ATPClientService::CallBcastLocationSync, this, std::placeholders::_1);
 	PacketService::GetInstance().recvCallBcastAction += std::bind(&ATPClientService::CallBcastAction, this, std::placeholders::_1);
 	PacketService::GetInstance().recvCallBcastHit += std::bind(&ATPClientService::CallBcastHit, this, std::placeholders::_1);
-	PacketService::GetInstance().recvCallBcastRotate += std::bind(&ATPClientService::CallBcastRotate, this, std::placeholders::_1);
+	PacketService::GetInstance().recvCallBcastRotationSync += std::bind(&ATPClientService::CallBcastRotationSync, this, std::placeholders::_1);
 }
 
 void ATPClientService::ClearRecvCallback()
@@ -147,7 +147,7 @@ void ATPClientService::ClearRecvCallback()
 	PacketService::GetInstance().recvCallBcastLocationSync.clear();
 	PacketService::GetInstance().recvCallBcastAction.clear();
 	PacketService::GetInstance().recvCallBcastHit.clear();
-	PacketService::GetInstance().recvCallBcastRotate.clear();
+	PacketService::GetInstance().recvCallBcastRotationSync.clear();
 }
 
 void ATPClientService::UpdateRtt(const int64 serverTimeMs, const int64 rttMsC2S)
@@ -208,9 +208,9 @@ void ATPClientService::CallBcastMove(const FBcastMove& bcastMove)
 	K2_RecvCallBcastMove(bcastMove);
 }
 
-void ATPClientService::CallBcastLocationSync(const FString& userId, const FVector& location)
+void ATPClientService::CallBcastLocationSync(const FBcastLocationSync& bcastLocationSync)
 {
-	K2_RecvCallBcastLocationSync(userId, location);
+	K2_RecvCallBcastLocationSync(bcastLocationSync);
 }
 
 void ATPClientService::CallBcastAction(const FBcastAction& bcastAction)
@@ -223,7 +223,7 @@ void ATPClientService::CallBcastHit(const FString& userId)
 	K2_RecvCallBcastHit(userId);
 }
 
-void ATPClientService::CallBcastRotate(const FBcastRotate& bcastRotate)
+void ATPClientService::CallBcastRotationSync(const FBcastRotationSync& bcastRotationSync)
 {
-	K2_RecvCallBcastRotate(bcastRotate);
+	K2_RecvCallBcastRotationSync(bcastRotationSync);
 }

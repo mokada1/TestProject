@@ -223,7 +223,7 @@ bool PacketGenerator::IsValidHeader(const PROTOCOL protocol)
 	case PROTOCOL::BCAST_LOCATION_SYNC:
 	case PROTOCOL::BCAST_ACTION:
 	case PROTOCOL::BCAST_HIT:
-	case PROTOCOL::BCAST_ROTATE:
+	case PROTOCOL::BCAST_ROTATION_SYNC:
 		return true;
 	}
 	return false;

@@ -25,7 +25,7 @@ Packet PacketGeneratorClient::CreateReqMove(FBcastMove& bcastMove)
 	return CreatePacket(PROTOCOL::REQ_MOVE, fbb, nullptr);
 }
 
-Packet PacketGeneratorClient::CreateReqMoveSync(const FVector& location)
+Packet PacketGeneratorClient::CreateReqLocationSync(const FVector& location)
 {
 	flatbuffers::FlatBufferBuilder fbb;
 
@@ -68,13 +68,13 @@ Packet PacketGeneratorClient::CreateReqDamage()
 	return CreatePacket(PROTOCOL::REQ_DAMAGE, fbb, nullptr);
 }
 
-Packet PacketGeneratorClient::CreateReqRotate(const FVector& rotation)
+Packet PacketGeneratorClient::CreateReqRotationSync(const FVector& rotation)
 {
 	flatbuffers::FlatBufferBuilder fbb;
 
 	ST_Vec3 stRotation(rotation.X, rotation.Y, rotation.Z);
 
-	fbb.Finish(CreateTB_ReqRotate(fbb, &stRotation));
+	fbb.Finish(CreateTB_ReqRotationSync(fbb, &stRotation));
 
-	return CreatePacket(PROTOCOL::REQ_ROTATE, fbb, nullptr);
+	return CreatePacket(PROTOCOL::REQ_ROTATION_SYNC, fbb, nullptr);
 }

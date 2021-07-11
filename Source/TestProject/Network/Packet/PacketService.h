@@ -4,7 +4,8 @@
 #include "../../Util/Delegate.h"
 #include "../Struct/BcastMove.h"
 #include "../Struct/BcastAction.h"
-#include "../Struct/BcastRotate.h"
+#include "../Struct/BcastRotationSync.h"
+#include "../Struct/BcastLocationSync.h"
 
 class Packet;
 class UObjUser;
@@ -20,8 +21,8 @@ public:
 	Delegate<const UObjUser* const> recvCallBcastEnterGameRoom;
 	Delegate<const FString&> recvCallBcastExitGameRoom;
 	Delegate<const FBcastMove&> recvCallBcastMove;
-	Delegate<const FString&, const FVector&> recvCallBcastLocationSync;
+	Delegate<const FBcastLocationSync&> recvCallBcastLocationSync;
 	Delegate<const FBcastAction&> recvCallBcastAction;
 	Delegate<const FString&> recvCallBcastHit;
-	Delegate<const FBcastRotate&> recvCallBcastRotate;
+	Delegate<const FBcastRotationSync&> recvCallBcastRotationSync;
 };

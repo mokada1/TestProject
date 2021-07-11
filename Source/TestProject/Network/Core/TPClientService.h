@@ -6,7 +6,8 @@
 #include "../../Util/TPDefine.h"
 #include "../Struct/BcastMove.h"
 #include "../Struct/BcastAction.h"
-#include "../Struct/BcastRotate.h"
+#include "../Struct/BcastRotationSync.h"
+#include "../Struct/BcastLocationSync.h"
 #include "TPClientService.generated.h"
 
 class UObjUser;
@@ -25,7 +26,7 @@ public:
 	bool ReqMove(const EOpMove operation, const FInputMove& inputMove);
 
 	UFUNCTION(BlueprintCallable, Category = Network)
-	bool ReqMoveSync(const FVector& location);
+	bool ReqLocationSync(const FVector& location);
 
 	UFUNCTION(BlueprintCallable, Category = Network)
 	bool ReqRoundTripTime();
@@ -37,7 +38,7 @@ public:
 	bool ReqDamage();
 
 	UFUNCTION(BlueprintCallable, Category = Network)
-	bool ReqRotate(const FVector& rotation);
+	bool ReqRotationSync(const FVector& rotation);
 
 	UFUNCTION(BlueprintCallable, Category = Network)
 	bool GetIsLogined() const;
@@ -75,8 +76,8 @@ protected:
 	void CallBcastMove(const FBcastMove& bcastMove);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastLocationSync", meta = (ScriptName = "RecvCallBcastLocationSync"))
-	void K2_RecvCallBcastLocationSync(const FString& userId, const FVector& location);
-	void CallBcastLocationSync(const FString& userId, const FVector& location);
+	void K2_RecvCallBcastLocationSync(const FBcastLocationSync& bcastLocationSync);
+	void CallBcastLocationSync(const FBcastLocationSync& bcastLocationSync);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastAction", meta = (ScriptName = "RecvCallBcastAction"))
 	void K2_RecvCallBcastAction(const FBcastAction& bcastAction);
@@ -86,9 +87,9 @@ protected:
 	void K2_RecvCallBcastHit(const FString& userId);
 	void CallBcastHit(const FString& userId);
 
-	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastRotate", meta = (ScriptName = "RecvCallBcastRotate"))
-	void K2_RecvCallBcastRotate(const FBcastRotate& bcastRotate);
-	void CallBcastRotate(const FBcastRotate& bcastRotate);
+	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastRotationSync", meta = (ScriptName = "RecvCallBcastRotationSync"))
+	void K2_RecvCallBcastRotationSync(const FBcastRotationSync& bcastRotationSync);
+	void CallBcastRotationSync(const FBcastRotationSync& bcastRotationSync);
 
 	UPROPERTY(BlueprintReadOnly, Category = Network)
 	FString propUserId;

@@ -23,7 +23,7 @@ void UCharacterAttributeComponent::Hit(const AActor* attacker)
 	//auto attackerStr = attackerAttributeComp->attributes.Find(ECharacterAttribute::Str);
 	auto targetHp = this->attributes.Find(ECharacterAttribute::Hp);
 	//*targetHp = FMath::Clamp((*targetHp - *attackerStr), 0.f, *targetHp);
-	*targetHp = FMath::Clamp((*targetHp - 10.f), 0.f, *targetHp);
+	*targetHp = FMath::Clamp((*targetHp - 1.f), 0.f, *targetHp);
 
 	UE_LOG(LogTemp, Log, TEXT("targetHp : %f"), *targetHp);
 }
