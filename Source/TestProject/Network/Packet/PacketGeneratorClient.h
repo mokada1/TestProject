@@ -17,6 +17,6 @@ public:
 	Packet CreateReqLocationSync(const FVector& location);
 	Packet CreateReqRoundTripTime();
 	Packet CreateReqAction(FBcastAction& bcastAction);
-	Packet CreateReqDamage();
+	Packet CreateReqAbility(EAbilityType abilityType, const FVector& location, const FVector& rotation);
 	Packet CreateReqRotationSync(const FVector& rotation);
 };

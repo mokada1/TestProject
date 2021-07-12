@@ -101,12 +101,18 @@ void PacketService::Process(const Packet& packet)
 	case PROTOCOL::BCAST_HIT:
 	{
 		auto req = flatbuffers::GetRoot<TB_BcastHit>(packet.GetBody());
-		auto userId = req->UserId()->c_str();
-
-		wchar_t wUserId[SIZE_USER_USER_ID];
-		TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, userId);
-
-		recvCallBcastHit(FString(wUserId));
+		auto hitIdList = req->HitIdList();
+		if (hitIdList && hitIdList->size() > 0)
+		{
+			TArray<FString> resultIdList;
+			for (auto it = hitIdList->begin(); it != hitIdList->end(); ++it)
+			{
+				wchar_t wUserId[SIZE_USER_USER_ID];
+				TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, it->c_str());
+				resultIdList.Add(FString(wUserId));
+			}
+			recvCallBcastHit(resultIdList);
+		}
 		break;
 	}
 	case PROTOCOL::BCAST_ROTATION_SYNC:

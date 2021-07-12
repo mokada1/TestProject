@@ -78,14 +78,14 @@ bool ATPClientService::ReqAction(const EOpAction operation, const FInputAction& 
 	return PacketProcessor::GetInstance().SendPacket(packet);
 }
 
-bool ATPClientService::ReqDamage()
+bool ATPClientService::ReqAbility(EAbilityType abilityType, const FVector& location, const FVector& rotation)
 {
 	if (!isLogined)
 	{
 		return false;
 	}
 
-	auto packet = PacketGeneratorClient::GetInstance().CreateReqDamage();
+	auto packet = PacketGeneratorClient::GetInstance().CreateReqAbility(abilityType, location, rotation);
 	return PacketProcessor::GetInstance().SendPacket(packet);
 }
 
@@ -218,9 +218,9 @@ void ATPClientService::CallBcastAction(const FBcastAction& bcastAction)
 	K2_RecvCallBcastAction(bcastAction);
 }
 
-void ATPClientService::CallBcastHit(const FString& userId)
+void ATPClientService::CallBcastHit(const TArray<FString>& hitIdList)
 {
-	K2_RecvCallBcastHit(userId);
+	K2_RecvCallBcastHit(hitIdList);
 }
 
 void ATPClientService::CallBcastRotationSync(const FBcastRotationSync& bcastRotationSync)

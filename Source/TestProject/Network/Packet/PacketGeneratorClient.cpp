@@ -59,13 +59,17 @@ Packet PacketGeneratorClient::CreateReqAction(FBcastAction& bcastAction)
 	return CreatePacket(PROTOCOL::REQ_ACTION, fbb, nullptr);
 }
 
-Packet PacketGeneratorClient::CreateReqDamage()
+Packet PacketGeneratorClient::CreateReqAbility(EAbilityType abilityType, const FVector& location, const FVector& rotation)
 {
 	flatbuffers::FlatBufferBuilder fbb;
 
-	fbb.Finish(CreateTB_ReqDamage(fbb));
+	AbilityType offsetAbilityType = EnumValuesAbilityType()[static_cast<uint8>(abilityType)];
+	ST_Vec3 offsetLocation(location.X, location.Y, location.Z);
+	ST_Vec3 offsetRotation(rotation.X, rotation.Y, rotation.Z);
 
-	return CreatePacket(PROTOCOL::REQ_DAMAGE, fbb, nullptr);
+	fbb.Finish(CreateTB_ReqAbility(fbb, offsetAbilityType, &offsetLocation, &offsetRotation));
+
+	return CreatePacket(PROTOCOL::REQ_ABILITY, fbb, nullptr);
 }
 
 Packet PacketGeneratorClient::CreateReqRotationSync(const FVector& rotation)

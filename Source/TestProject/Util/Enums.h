@@ -65,3 +65,13 @@ enum class EOpAction : uint8
 	MeleeAttack				UMETA(DisplayName = "MeleeAttack"),
 	MeleeAttackCombo		UMETA(DisplayName = "MeleeAttackCombo"),
 };
+
+UENUM(BlueprintType)
+enum class EAbilityType : uint8
+{
+	None					UMETA(DisplayName = "None"),
+	MeleeAttack1			UMETA(DisplayName = "MeleeAttack1"),
+	MeleeAttack2_1			UMETA(DisplayName = "MeleeAttack2_1"),
+	MeleeAttack2_2			UMETA(DisplayName = "MeleeAttack2_2"),
+	MeleeAttack3			UMETA(DisplayName = "MeleeAttack3"),
+};

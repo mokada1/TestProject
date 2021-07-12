@@ -2,6 +2,7 @@
 #include "../../TP_generated.h"
 #include "../../Util/TPLogger.h"
 #include "../Packet/PacketProcessor.h"
+#include "../../Util/TPUtil.h"
 
 USocketRSThread::~USocketRSThread()
 {
@@ -59,19 +60,24 @@ bool USocketRSThread::SendPacket(const Packet& packet)
 	memset(&(perIoData.overlapped), 0, sizeof(OVERLAPPED));
 	perIoData.wsaBuf.len = static_cast<ULONG>(packet.GetPacketSize());
 	perIoData.wsaBuf.buf = packet.GetBuffer();
-	perIoData.operation = OP_ClientToServer;
+	perIoData.operation = OP_CLIENT_TO_SERVER;
 
 	if (WSASend(hSocket, &(perIoData.wsaBuf), 1, &sendBytes, flags, &(perIoData.overlapped), NULL) == SOCKET_ERROR)
 	{
 		auto e = WSAGetLastError();
 		if (e != WSA_IO_PENDING)
 		{
-			TPLogger::GetInstance().PrintLog("WSASend() Error:%d", e);
+			TPLogger::GetInstance().PrintLog(WSASEND_ERROR, e);
 			return false;
 		}
 	}
 
-	TPLogger::GetInstance().PrintLog("Number of bytes transferred:%d", sendBytes);
+	TPLogger::GetInstance().PrintLog(TRANSFERRED_BYTES, sendBytes);
+
+	auto header = packet.GetHeader();
+	auto strHeader = TPUtil::GetInstance().EnumToString(header);
+
+	TPLogger::GetInstance().PrintLog(SEND_PACKET_1, strHeader);
 		
 	return true;
 }
@@ -86,14 +92,14 @@ bool USocketRSThread::RecvPacket()
 	perIoData.overlapped.hEvent = WSACreateEvent();
 	perIoData.wsaBuf.len = MAX_BUFF_SIZE;
 	perIoData.wsaBuf.buf = perIoData.buffer;
-	perIoData.operation = OP_ServerToClient;
+	perIoData.operation = OP_SERVER_TO_CLIENT;
 
 	if (WSARecv(hSocket, &(perIoData.wsaBuf), 1, &recvBytes, &flags, &(perIoData.overlapped), NULL) == SOCKET_ERROR)
 	{
 		auto e = WSAGetLastError();
 		if (e != WSA_IO_PENDING)
 		{
-			TPLogger::GetInstance().PrintLog("WSARecv() error:%d", e);
+			TPLogger::GetInstance().PrintLog(WSARECV_ERROR, e);
 			return false;
 		}
 	}
@@ -102,7 +108,7 @@ bool USocketRSThread::RecvPacket()
 
 	WSAGetOverlappedResult(hSocket, &perIoData.overlapped, &recvBytes, false, &flags);
 
-	TPLogger::GetInstance().PrintLog("Number of bytes received:%d", recvBytes);
+	TPLogger::GetInstance().PrintLog(RECEIVED_BYTES, recvBytes);
 		
 	if (recvBytes > 0)
 	{

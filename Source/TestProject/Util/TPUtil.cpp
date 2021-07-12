@@ -5,6 +5,7 @@
 #include <time.h>
 #include <ctime>
 #include <iostream>
+#include <math.h>
 
 using namespace std;
 
@@ -63,7 +64,7 @@ const char* TPUtil::EnumToString(PROTOCOL protocol)
 	case PROTOCOL::REQ_LOCATION_SYNC: return "REQ_LOCATION_SYNC";
 	case PROTOCOL::REQ_ROUND_TRIP_TIME: return "REQ_ROUND_TRIP_TIME";
 	case PROTOCOL::REQ_ACTION: return "REQ_ACTION";
-	case PROTOCOL::REQ_DAMAGE: return "REQ_DAMAGE";
+	case PROTOCOL::REQ_ABILITY: return "REQ_ABILITY";
 	case PROTOCOL::REQ_ROTATION_SYNC: return "REQ_ROTATION_SYNC";
 	case PROTOCOL::RES_LOGIN: return "RES_LOGIN";
 	case PROTOCOL::RES_ROUND_TRIP_TIME: return "RES_ROUND_TRIP_TIME";
@@ -86,4 +87,16 @@ float TPUtil::Distance(const Vector3 v1, const Vector3 v2)
 	auto dy = v1.y > v2.y ? v1.y - v2.y : v2.y - v1.y;
 	auto dz = v1.z > v2.z ? v1.z - v2.z : v2.z - v1.z;
 	return dx + dy + dz;
+}
+
+Vector3 TPUtil::RotateByZAxis(const Vector3 location, const double degree)
+{
+	float x = location.x * cos(degree) - location.y * sin(degree);
+	float y = location.x * sin(degree) + location.y * cos(degree);
+	return { x, y, location.z };
+}
+
+double TPUtil::GetRadian(const double degree)
+{
+	return degree * (TPUTIL_PI / TPUTIL_PI_RADIAN);
 }

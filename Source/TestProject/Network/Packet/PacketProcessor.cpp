@@ -27,7 +27,7 @@ void PacketProcessor::Parse(char* const buffer, const size_t recvBytes)
 		auto header = packet->GetHeader();
 		auto strHeader = TPUtil::GetInstance().EnumToString(header);
 
-		TPLogger::GetInstance().PrintLog("Recv packet:%s", strHeader);
+		TPLogger::GetInstance().PrintLog(RECV_PACKET_1, strHeader);
 
 		packetQueue.Enqueue(packet);
 	}

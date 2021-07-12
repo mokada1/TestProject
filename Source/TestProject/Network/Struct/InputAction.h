@@ -26,6 +26,7 @@ public:
 	{
 		location = FVector(0.f, 0.f, 0.f);
 		rotation = FVector(0.f, 0.f, 0.f);
+		isCombatPosture = false;
 	}
 	FInputAction(const TB_InputAction& InputAction)
 	{

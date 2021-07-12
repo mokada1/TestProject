@@ -35,7 +35,7 @@ public:
 	bool ReqAction(const EOpAction operation, const FInputAction& inputAction);
 
 	UFUNCTION(BlueprintCallable, Category = Network)
-	bool ReqDamage();
+	bool ReqAbility(EAbilityType abilityType, const FVector& location, const FVector& rotation);
 
 	UFUNCTION(BlueprintCallable, Category = Network)
 	bool ReqRotationSync(const FVector& rotation);
@@ -84,8 +84,8 @@ protected:
 	void CallBcastAction(const FBcastAction& bcastAction);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastHit", meta = (ScriptName = "RecvCallBcastHit"))
-	void K2_RecvCallBcastHit(const FString& userId);
-	void CallBcastHit(const FString& userId);
+	void K2_RecvCallBcastHit(const TArray<FString>& hitIdList);
+	void CallBcastHit(const TArray<FString>& hitIdList);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastRotationSync", meta = (ScriptName = "RecvCallBcastRotationSync"))
 	void K2_RecvCallBcastRotationSync(const FBcastRotationSync& bcastRotationSync);
