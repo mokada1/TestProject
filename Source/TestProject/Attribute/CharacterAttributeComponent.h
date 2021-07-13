@@ -6,6 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "CharacterAttributeComponent.generated.h"
 
+class UCompUserAttribute;
+
 UCLASS(Blueprintable, ClassGroup = (Custom))
 class TESTPROJECT_API UCharacterAttributeComponent : public UActorComponent
 {
@@ -16,11 +18,14 @@ public:
 	bool isAlive();
 
 	UFUNCTION(BlueprintCallable, Category = Attribute)
-		void Hit(const AActor* attacker);
+	float UpdateAttribute(const ECharacterAttribute attribute, const float value);
+
+	UFUNCTION(BlueprintCallable, Category = Attribute)
+	void UpdateAttrByCompUserAttr(UCompUserAttribute* const compUserAttribute);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Attribute)
-		TMap<ECharacterAttribute, float> attributes;
+	TMap<ECharacterAttribute, float> attributes;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Ability)
-		UAnimMontage* montageForHit;
+	UAnimMontage* montageForHit;
 };

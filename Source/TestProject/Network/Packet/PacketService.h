@@ -23,6 +23,6 @@ public:
 	Delegate<const FBcastMove&> recvCallBcastMove;
 	Delegate<const FBcastLocationSync&> recvCallBcastLocationSync;
 	Delegate<const FBcastAction&> recvCallBcastAction;
-	Delegate<const TArray<FString>&> recvCallBcastHit;
+	Delegate<const TArray<UObjUser*>&> recvCallBcastHit;
 	Delegate<const FBcastRotationSync&> recvCallBcastRotationSync;
 };

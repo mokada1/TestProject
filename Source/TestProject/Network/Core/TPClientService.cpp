@@ -218,9 +218,9 @@ void ATPClientService::CallBcastAction(const FBcastAction& bcastAction)
 	K2_RecvCallBcastAction(bcastAction);
 }
 
-void ATPClientService::CallBcastHit(const TArray<FString>& hitIdList)
+void ATPClientService::CallBcastHit(const TArray<UObjUser*>& objUserList)
 {
-	K2_RecvCallBcastHit(hitIdList);
+	K2_RecvCallBcastHit(objUserList);
 }
 
 void ATPClientService::CallBcastRotationSync(const FBcastRotationSync& bcastRotationSync)

@@ -84,8 +84,8 @@ protected:
 	void CallBcastAction(const FBcastAction& bcastAction);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastHit", meta = (ScriptName = "RecvCallBcastHit"))
-	void K2_RecvCallBcastHit(const TArray<FString>& hitIdList);
-	void CallBcastHit(const TArray<FString>& hitIdList);
+	void K2_RecvCallBcastHit(const TArray<UObjUser*>& objUserList);
+	void CallBcastHit(const TArray<UObjUser*>& objUserList);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Network, DisplayName = "RecvCallBcastRotationSync", meta = (ScriptName = "RecvCallBcastRotationSync"))
 	void K2_RecvCallBcastRotationSync(const FBcastRotationSync& bcastRotationSync);

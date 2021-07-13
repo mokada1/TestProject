@@ -16,6 +16,11 @@ UCompUserCondition* UObjUser::BP_GetCompCondition() const
 	return compCondition;
 }
 
+UCompUserAttribute* UObjUser::BP_GetCompAttribute() const
+{
+	return compAttribute;
+}
+
 wchar_t* UObjUser::GetObjectId() const
 {
 	return GetUserId();
@@ -42,18 +47,30 @@ flatbuffers::Offset<TB_ObjUser> UObjUser::SerializeFB(flatbuffers::FlatBufferBui
 	return builder.Finish();
 }
 
-UObjUser* UObjUser::Create(wchar_t* const _userId)
+UObjUser* UObjUser::Create(const TB_ObjUser& tb)
 {
+	wchar_t wUserId[SIZE_USER_USER_ID];
+	TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, tb.UserId()->c_str());
+
 	auto obj = NewObject<UObjUser>();
-	obj->Init(_userId);
+	obj->Init(wUserId);
+
+	auto newCompTransform = UCompUserTransform::Create(*tb.Transform());
+	auto newCompCondition = UCompUserCondition::Create(*tb.Condition());
+	auto newCompAttribute = UCompUserAttribute::Create(*tb.Attribute());
+
+	obj->SetCompTransform(newCompTransform);
+	obj->SetCompCondition(newCompCondition);
+	obj->SetCompAttribute(newCompAttribute);
+
 	return obj;
 }
 
 void UObjUser::Init()
 {
-	this->userId = nullptr;
-	this->compTransform = nullptr;
-	this->compCondition = nullptr;
+	userId = nullptr;
+	compTransform = nullptr;
+	compCondition = nullptr;
 }
 
 void UObjUser::Init(wchar_t* const _userId)
@@ -74,17 +91,22 @@ UObjUser::~UObjUser()
 
 wchar_t* UObjUser::GetUserId() const
 {
-	return this->userId;
+	return userId;
 }
 
 UCompUserTransform* UObjUser::GetCompTransform() const
 {
-	return this->compTransform;
+	return compTransform;
 }
 
 UCompUserCondition* UObjUser::GetCompCondition() const
 {
-	return this->compCondition;
+	return compCondition;
+}
+
+UCompUserAttribute* UObjUser::GetCompAttribute() const
+{
+	return compAttribute;
 }
 
 void UObjUser::SetCompTransform(UCompUserTransform* const _compTransform)
@@ -95,4 +117,9 @@ void UObjUser::SetCompTransform(UCompUserTransform* const _compTransform)
 void UObjUser::SetCompCondition(UCompUserCondition* const _compCondition)
 {
 	this->compCondition = _compCondition;
+}
+
+void UObjUser::SetCompAttribute(UCompUserAttribute* const _compAttribute)
+{
+	this->compAttribute = _compAttribute;
 }

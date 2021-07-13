@@ -18,7 +18,7 @@ public:
 	virtual bool IsValid() const override;
 	flatbuffers::Offset<TB_CompUserTransform> SerializeFB(flatbuffers::FlatBufferBuilder& _fbb) const;
 
-	static UCompUserTransform* Create(const Vector3 _location, const Vector3 _rotation);
+	static UCompUserTransform* Create(const TB_CompUserTransform& tb);
 	~UCompUserTransform();
 
 	Vector3 GetLocation() const;

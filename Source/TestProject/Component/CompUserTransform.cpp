@@ -26,10 +26,13 @@ flatbuffers::Offset<TB_CompUserTransform> UCompUserTransform::SerializeFB(flatbu
 	return builder.Finish();
 }
 
-UCompUserTransform* UCompUserTransform::Create(const Vector3 _location, const Vector3 _rotation)
+UCompUserTransform* UCompUserTransform::Create(const TB_CompUserTransform& tb)
 {
 	auto comp = NewObject<UCompUserTransform>();
-	comp->Init(_location, _rotation);
+	comp->Init(
+		{ tb.Location()->x(), tb.Location()->y(), tb.Location()->z() }, 
+		{ tb.Rotation()->x(), tb.Rotation()->y(), tb.Rotation()->z() }
+	);
 	return comp;
 }
 

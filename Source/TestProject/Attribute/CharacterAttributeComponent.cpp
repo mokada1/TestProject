@@ -3,6 +3,7 @@
 
 #include "CharacterAttributeComponent.h"
 #include "GameFramework/Character.h"
+#include "../Component/CompUserAttribute.h"
 
 bool UCharacterAttributeComponent::isAlive()
 {
@@ -14,16 +15,24 @@ bool UCharacterAttributeComponent::isAlive()
 	return false;
 }
 
-void UCharacterAttributeComponent::Hit(const AActor* attacker)
+float UCharacterAttributeComponent::UpdateAttribute(const ECharacterAttribute attribute, const float value)
 {
-	//auto attackerComp = attacker->GetComponentByClass(UCharacterAttributeComponent::StaticClass());
-	//auto attackerAttributeComp = Cast<UCharacterAttributeComponent>(attackerComp);
+	auto hp = attributes.Find(attribute);
+	auto diff = value - *hp;
+	*hp = value;
+	return diff;
+}
 
-	// 공격 피해량 적용
-	//auto attackerStr = attackerAttributeComp->attributes.Find(ECharacterAttribute::Str);
-	auto targetHp = this->attributes.Find(ECharacterAttribute::Hp);
-	//*targetHp = FMath::Clamp((*targetHp - *attackerStr), 0.f, *targetHp);
-	*targetHp = FMath::Clamp((*targetHp - 1.f), 0.f, *targetHp);
-
-	UE_LOG(LogTemp, Log, TEXT("targetHp : %f"), *targetHp);
+void UCharacterAttributeComponent::UpdateAttrByCompUserAttr(UCompUserAttribute* const compUserAttribute)
+{
+	auto hp = attributes.Find(ECharacterAttribute::Hp);
+	auto str = attributes.Find(ECharacterAttribute::Str);
+	if (hp)
+	{
+		*hp = compUserAttribute->GetHp();
+	}
+	if (str)
+	{
+		*str = compUserAttribute->GetStr();
+	}
 }

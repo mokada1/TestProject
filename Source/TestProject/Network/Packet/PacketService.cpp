@@ -24,16 +24,7 @@ void PacketService::Process(const Packet& packet)
 			TArray<UObjUser*> resultObjList;
 			for (auto it = objUserList->begin(); it != objUserList->end(); ++it)
 			{
-				wchar_t wUserId[SIZE_USER_USER_ID];
-				TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, it->UserId()->c_str());
-				auto newObjUser = UObjUser::Create(wUserId);
-				auto newCompTransform = UCompUserTransform::Create(
-					{ it->Transform()->Location()->x(), it->Transform()->Location()->y(), it->Transform()->Location()->z() },
-					{ it->Transform()->Rotation()->x(), it->Transform()->Rotation()->y(), it->Transform()->Rotation()->z() }
-				);
-				auto newCompCondition = UCompUserCondition::Create(it->Condition()->IsCombatPosture());
-				newObjUser->SetCompTransform(newCompTransform);
-				newObjUser->SetCompCondition(newCompCondition);
+				auto newObjUser = UObjUser::Create(*(*it));
 				resultObjList.Add(newObjUser);
 			}
 			recvCallResLogin(resultObjList);
@@ -54,16 +45,7 @@ void PacketService::Process(const Packet& packet)
 		auto objUser = req->ObjUser();
 		if (objUser)
 		{
-			wchar_t wUserId[SIZE_USER_USER_ID];
-			TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, objUser->UserId()->c_str());
-			auto newObjUser = UObjUser::Create(wUserId);
-			auto newCompTransform = UCompUserTransform::Create(
-				{ objUser->Transform()->Location()->x(), objUser->Transform()->Location()->y(), objUser->Transform()->Location()->z() },
-				{ objUser->Transform()->Rotation()->x(), objUser->Transform()->Rotation()->y(), objUser->Transform()->Rotation()->z() }
-			);
-			auto newCompCondition = UCompUserCondition::Create(objUser->Condition()->IsCombatPosture());
-			newObjUser->SetCompTransform(newCompTransform);
-			newObjUser->SetCompCondition(newCompCondition);
+			auto newObjUser = UObjUser::Create(*objUser);
 			recvCallBcastEnterGameRoom(newObjUser);
 		}
 		break;
@@ -101,17 +83,16 @@ void PacketService::Process(const Packet& packet)
 	case PROTOCOL::BCAST_HIT:
 	{
 		auto req = flatbuffers::GetRoot<TB_BcastHit>(packet.GetBody());
-		auto hitIdList = req->HitIdList();
-		if (hitIdList && hitIdList->size() > 0)
+		auto objUserList = req->ObjUserList();
+		if (objUserList && objUserList->size() > 0)
 		{
-			TArray<FString> resultIdList;
-			for (auto it = hitIdList->begin(); it != hitIdList->end(); ++it)
+			TArray<UObjUser*> resultObjList;
+			for (auto it = objUserList->begin(); it != objUserList->end(); ++it)
 			{
-				wchar_t wUserId[SIZE_USER_USER_ID];
-				TPUtil::GetInstance().MultiByteToWChar(wUserId, SIZE_USER_USER_ID, it->c_str());
-				resultIdList.Add(FString(wUserId));
+				auto newObjUser = UObjUser::Create(*(*it));
+				resultObjList.Add(newObjUser);
 			}
-			recvCallBcastHit(resultIdList);
+			recvCallBcastHit(resultObjList);
 		}
 		break;
 	}
