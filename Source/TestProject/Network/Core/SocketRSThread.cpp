@@ -8,7 +8,7 @@ USocketRSThread::~USocketRSThread()
 {
 	if (IsRunning())
 	{
-		delete thread;
+		thread->Kill(true);
 		thread = nullptr;
 	}
 }

@@ -90,6 +90,15 @@ void ATPClient::CallEndPlay(const EEndPlayReason::Type endPlayReason)
 
 void ATPClient::Close()
 {
+    isConnected = false;
+    PacketProcessor::GetInstance().SetClient(nullptr);
+
+    if (session)
+    {
+        delete session;
+        session = nullptr;
+    }
+
 	if (hSocket)
 	{
         if (rsThread && rsThread->IsRunning())
@@ -100,17 +109,7 @@ void ATPClient::Close()
         closesocket(hSocket);
 	}
     
-    WSACleanup();   
-
-    if (session)
-    {
-        delete session;
-        session = nullptr;
-    }
-    
-    PacketProcessor::GetInstance().SetClient(nullptr);
-    
-    isConnected = false;
+    WSACleanup();
 }
 
 bool ATPClient::GetIsConnected() const

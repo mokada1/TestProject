@@ -26,6 +26,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Attribute)
 	TMap<ECharacterAttribute, float> attributes;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Attribute)
+	TMap<ECharacterAttribute, float> attributesMax;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Ability)
 	UAnimMontage* montageForHit;
 };

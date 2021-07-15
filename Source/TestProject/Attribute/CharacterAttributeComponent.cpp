@@ -30,6 +30,11 @@ void UCharacterAttributeComponent::UpdateAttrByCompUserAttr(UCompUserAttribute* 
 	if (hp)
 	{
 		*hp = compUserAttribute->GetHp();
+		auto maxHp = attributesMax.Find(ECharacterAttribute::Hp);
+		if (maxHp)
+		{
+			*maxHp = *hp;
+		}
 	}
 	if (str)
 	{
