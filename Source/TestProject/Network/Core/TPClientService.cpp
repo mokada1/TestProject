@@ -153,12 +153,13 @@ void ATPClientService::ClearRecvCallback()
 void ATPClientService::UpdateRtt(const int64 serverTimeMs, const int64 rttMsC2S)
 {
 	const auto clientTimeMs = TPUtil::GetInstance().TimeSinceEpochMs();
-	const auto rttMsS2C = TPUTIL_MAX(clientTimeMs - serverTimeMs, 0);
+	const auto rttMsS2C = clientTimeMs - serverTimeMs;
 	const auto rttMs = rttMsC2S + rttMsS2C;
 	
 	// 왕복 시간이 너무 큰 값이면 무시(1초 기준)
 	if (rttMs > MAX_RTT_MS)
 	{
+		TPLogger::GetInstance().PrintLog("[Ignored] rttMsC2S:%lld rttMsS2C:%lld rttMs:%lld avgRttMs:%lld", rttMsC2S, rttMsS2C, rttMs, avgRttMs);
 		return;
 	}
 
@@ -171,7 +172,7 @@ void ATPClientService::UpdateRtt(const int64 serverTimeMs, const int64 rttMsC2S)
 	rttCount++;
 	avgRttMs = totalRttMs / rttCount;
 
-	TPLogger::GetInstance().PrintLog("rttMsC2S:%lld rttMsS2C:%lld avgRttMs:%lld", rttMsC2S, rttMsS2C, avgRttMs);
+	TPLogger::GetInstance().PrintLog("rttMsC2S:%lld rttMsS2C:%lld rttMs:%lld avgRttMs:%lld", rttMsC2S, rttMsS2C, rttMs, avgRttMs);
 }
 
 void ATPClientService::CallError(const FString& message)
