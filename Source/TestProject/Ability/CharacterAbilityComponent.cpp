@@ -25,15 +25,15 @@ void UCharacterAbilityComponent::Initialize()
 			auto abilityCDO = ability.GetDefaultObject();
 			if (abilityCDO)
 			{
-				auto useInfo = NewObject<UAbliltyUseInfo>();
-				useInfo->Initialize(abilityCDO->abilityType, abilityCDO->abilityGroupType);
+				auto useInfo = NewObject<UAbilityUseInfo>();
+				useInfo->Initialize(abilityCDO->abilityType, abilityCDO->abilityGroupType, abilityCDO->playToMontage);
 				abilityUseInfoSet.Add(useInfo);
 			}
 		}
-	}	
+	}
 }
 
-bool UCharacterAbilityComponent::ContainsUseInfo(const FAbliltyActivationInfo& activationInfo) const
+bool UCharacterAbilityComponent::ContainsUseInfo(const FAbilityActivationInfo& activationInfo) const
 {
 	for (auto& abilityUseInfo : abilityUseInfoSet)
 	{
@@ -45,26 +45,13 @@ bool UCharacterAbilityComponent::ContainsUseInfo(const FAbliltyActivationInfo& a
 	return false;
 }
 
-UAbliltyUseInfo* UCharacterAbilityComponent::FindUseInfo(const FAbliltyActivationInfo& activationInfo) const
+UAbilityUseInfo* UCharacterAbilityComponent::FindUseInfo(const FAbilityActivationInfo& activationInfo) const
 {
 	for (auto& abilityUseInfo : abilityUseInfoSet)
 	{
 		if (abilityUseInfo->GetAbilityType() == activationInfo.abilityType)
 		{
 			return abilityUseInfo;
-		}
-	}
-	return nullptr;
-}
-
-UCharacterAbility* UCharacterAbilityComponent::FindAbility(const FAbliltyActivationInfo& activationInfo) const
-{
-	for (auto& ability : abilities)
-	{
-		auto abilityCDO = ability.GetDefaultObject();
-		if (abilityCDO->abilityType == activationInfo.abilityType)
-		{
-			return abilityCDO;
 		}
 	}
 	return nullptr;
@@ -81,16 +68,12 @@ void UCharacterAbilityComponent::SetIsActivated(ECharacterAbility abilityType, b
 	}
 }
 
-bool UCharacterAbilityComponent::ActivateAbility(const FAbliltyActivationInfo& activationInfo)
+bool UCharacterAbilityComponent::ActivateAbility(const FAbilityActivationInfo& activationInfo)
 {
 	auto useInfo = FindUseInfo(activationInfo);
 	if (useInfo && !useInfo->GetIsActivated())
 	{
-		auto ability = FindAbility(activationInfo);
-		if (ability)
-		{
-			ability->CallActivateAbility(activationInfo, useInfo);
-		}		
+		CallActivateAbility(activationInfo, useInfo);
 		return true;
 	}
 	return false;
@@ -106,4 +89,16 @@ bool UCharacterAbilityComponent::IsActivatedAbility(const ECharacterAbilityGroup
 		}
 	}
 	return false;
+}
+
+void UCharacterAbilityComponent::EndAbility(const FAbilityActivationInfo& activationInfo, UAbilityUseInfo* abilityUseInfo)
+{
+	K2_DeactivateAbility(activationInfo, abilityUseInfo);
+	abilityUseInfo->SetIsActivated(false);
+}
+
+void UCharacterAbilityComponent::CallActivateAbility(const FAbilityActivationInfo& activationInfo, UAbilityUseInfo* abilityUseInfo)
+{
+	abilityUseInfo->SetIsActivated(true);
+	K2_ActivateAbility(activationInfo, abilityUseInfo);
 }
