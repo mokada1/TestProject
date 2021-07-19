@@ -1,13 +1,15 @@
 #include "TPUtil.h"
+//#include "../timezone/date/tz.h"
+
 #include <stdio.h>
 #include <Windows.h>
 #include <chrono>
-#include <time.h>
 #include <ctime>
+#include <cmath>
 #include <iostream>
-#include <math.h>
 
 using namespace std;
+//using namespace date;
 
 using chrono::duration_cast;
 using chrono::milliseconds;
@@ -49,10 +51,11 @@ long long TPUtil::TimeSinceEpochMs()
 	return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 }
 
-long long TPUtil::TimeSinceEpochSec()
-{
-	return duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
-}
+//long long TPUtil::TimeSinceEpochMs(const char* const timeZone)
+//{
+//	auto t = make_zoned(timeZone, system_clock::now());
+//	return duration_cast<milliseconds>(t.get_local_time().time_since_epoch()).count();
+//}
 
 const char* TPUtil::EnumToString(PROTOCOL protocol)
 {
@@ -89,14 +92,15 @@ float TPUtil::Distance(const Vector3 v1, const Vector3 v2)
 	return dx + dy + dz;
 }
 
-Vector3 TPUtil::RotateByZAxis(const Vector3 location, const double degree)
+Vector3 TPUtil::RotateByZAxis(const Vector3 location, const float degree)
 {
-	float x = location.x * cos(degree) - location.y * sin(degree);
-	float y = location.x * sin(degree) + location.y * cos(degree);
+	const float radian = GetRadian(degree);
+	float x = location.x * cos(radian) - location.y * sin(radian);
+	float y = location.x * sin(radian) + location.y * cos(radian);
 	return { x, y, location.z };
 }
 
-double TPUtil::GetRadian(const double degree)
+float TPUtil::GetRadian(const float degree)
 {
 	return degree * (TPUTIL_PI / TPUTIL_PI_RADIAN);
 }
