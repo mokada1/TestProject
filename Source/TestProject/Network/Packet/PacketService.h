@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../Util/TSingleton.h"
+#include "../../Util/Unconstructible.h"
 #include "../../Util/Delegate.h"
 #include "../Struct/BcastMove.h"
 #include "../Struct/BcastAction.h"
@@ -10,9 +10,15 @@
 class Packet;
 class UObjUser;
 
-class PacketService : public TSingleton<PacketService>
+class PacketService : public Unconstructible
 {
 public:
+	static PacketService& GetInstance()
+	{
+		static PacketService* _instance = new PacketService();
+		return *_instance;
+	}
+
 	void Process(const Packet& packet);
 
 	Delegate<const FString&> recvCallError;
@@ -25,4 +31,7 @@ public:
 	Delegate<const FBcastAction&> recvCallBcastAction;
 	Delegate<const TArray<UObjUser*>&> recvCallBcastHit;
 	Delegate<const FBcastRotationSync&> recvCallBcastRotationSync;
+
+private:
+	PacketService() {}
 };

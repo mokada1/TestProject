@@ -2,14 +2,20 @@
 
 #pragma once
 
-#include "TSingleton.h"
+#include "Unconstructible.h"
 #include "Logging/LogMacros.h"
 
 #include <stdio.h>
 
-class TESTPROJECT_API TPLogger : public TSingleton<TPLogger>
+class TESTPROJECT_API TPLogger : public Unconstructible
 {
 public:
+	static TPLogger& GetInstance()
+	{
+		static TPLogger* _instance = new TPLogger();
+		return *_instance;
+	}
+
 	template<typename ... Args>
 	void PrintLog(const char* const format, Args ... args)
 	{
@@ -29,4 +35,7 @@ public:
 		UE_LOG(LogTemp, Log, TEXT("%S"), buffer);
 		delete buffer;
 	}
+
+private:
+	TPLogger() {}
 };
