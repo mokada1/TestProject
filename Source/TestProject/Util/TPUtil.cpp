@@ -1,8 +1,11 @@
 #include "TPUtil.h"
 //#include "../timezone/date/tz.h"
 
-#include <stdio.h>
+#include "Runtime/Core/Public/Windows/AllowWindowsPlatformTypes.h"
 #include <Windows.h>
+#include "Runtime/Core/Public/Windows/HideWindowsPlatformTypes.h"
+
+#include <stdio.h>
 #include <chrono>
 #include <ctime>
 #include <cmath>
