@@ -26,15 +26,15 @@ float UCharacterAttributeComponent::UpdateAttribute(const ECharacterAttribute at
 void UCharacterAttributeComponent::UpdateAttrByCompUserAttr(UCompUserAttribute* const compUserAttribute)
 {
 	auto hp = attributes.Find(ECharacterAttribute::Hp);
+	auto maxHp = attributesMax.Find(ECharacterAttribute::Hp);
 	auto str = attributes.Find(ECharacterAttribute::Str);
 	if (hp)
 	{
 		*hp = compUserAttribute->GetHp();
-		auto maxHp = attributesMax.Find(ECharacterAttribute::Hp);
-		if (maxHp)
-		{
-			*maxHp = *hp;
-		}
+	}
+	if (maxHp)
+	{
+		*maxHp = compUserAttribute->GetMaxHp();
 	}
 	if (str)
 	{

@@ -13,6 +13,9 @@ public:
 	float BP_GetHp() const;
 
 	UFUNCTION(BlueprintCallable)
+	float BP_GetMaxHp() const;
+
+	UFUNCTION(BlueprintCallable)
 	float BP_GetStr() const;
 
 	virtual bool IsValid() const override;
@@ -22,13 +25,15 @@ public:
 	~UCompUserAttribute();
 
 	float GetHp() const;
+	float GetMaxHp() const;
 	float GetStr() const;
 
 private:
 	void Init();
-	void Init(const float _hp, const float _str);
+	void Init(const float _hp, const float _maxHp, const float _str);
 
 	bool isValid;
 	float hp;
+	float maxHp;
 	float str;
 };
